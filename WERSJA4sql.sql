@@ -548,7 +548,6 @@ ALTER TABLE ActivitiesTypes ADD CONSTRAINT UQ_ActivitiesTypes_TypeName UNIQUE (T
 
 -- Cities
 ALTER TABLE Cities ADD CONSTRAINT UQ_Cities_CityName_CountryID UNIQUE (CityName, CountryID);
-ALTER TABLE Cities ADD CONSTRAINT CHK_Cities_PostalCode_LIKE CHECK (PostalCode LIKE '[0-9][0-9]-[0-9][0-9][0-9]');
 
 -- Countries
 ALTER TABLE Countries ADD CONSTRAINT UQ_Countries_CountryName UNIQUE (CountryName);
