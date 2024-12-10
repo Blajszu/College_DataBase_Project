@@ -5,14 +5,14 @@
 -- Table: ActivitiesTypes
 CREATE TABLE ActivitiesTypes (
     ActivityTypeID int  NOT NULL,
-    TypeName varchar  NOT NULL,
+    TypeName varchar(40)  NOT NULL,
     CONSTRAINT ActivitiesTypes_pk PRIMARY KEY  (ActivityTypeID)
 );
 
 -- Table: Cities
 CREATE TABLE Cities (
     CityID int  NOT NULL,
-    CityName varchar  NOT NULL,
+    CityName varchar(40)  NOT NULL,
     CountryID int  NOT NULL,
     CONSTRAINT Cities_pk PRIMARY KEY  (CityID)
 );
@@ -20,7 +20,7 @@ CREATE TABLE Cities (
 -- Table: Countries
 CREATE TABLE Countries (
     CountryID int  NOT NULL,
-    CountryName varchar  NOT NULL,
+    CountryName varchar(40)  NOT NULL,
     CONSTRAINT Countries_pk PRIMARY KEY  (CountryID)
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE Countries (
 CREATE TABLE CourseSegment (
     SegmentID int  NOT NULL,
     CourseID int  NOT NULL,
-    SegmentName varchar  NOT NULL,
+    SegmentName varchar(40)  NOT NULL,
     SegmentType int  NOT NULL,
     LecturerID int  NOT NULL,
     StartDate datetime  NOT NULL,
@@ -42,10 +42,10 @@ CREATE TABLE CourseSegment (
 CREATE TABLE CourseSegmentDetails (
     SegmentID int  NOT NULL,
     SegmentType int  NOT NULL,
-    SegmentDescription varchar  NULL,
+    SegmentDescription varchar(128)  NULL,
     RoomID int  NOT NULL,
     NumberOfStudentsLimit int  NULL,
-    Link varchar  NULL,
+    Link varchar(128)  NULL,
     CONSTRAINT CourseSegmentDetails_pk PRIMARY KEY  (SegmentID)
 );
 
@@ -60,9 +60,9 @@ CREATE TABLE CourseSegmentPresence (
 -- Table: Courses
 CREATE TABLE Courses (
     CourseID int  NOT NULL,
-    CourseName varchar  NOT NULL,
+    CourseName varchar(40)  NOT NULL,
     CourseCoordinatorID int  NOT NULL,
-    CourseDescription varchar  NOT NULL,
+    CourseDescription varchar(128)  NOT NULL,
     CoursePrice money  NOT NULL,
     CONSTRAINT Courses_pk PRIMARY KEY  (CourseID)
 );
@@ -70,7 +70,7 @@ CREATE TABLE Courses (
 -- Table: Degrees
 CREATE TABLE Degrees (
     DegreeID int  NOT NULL,
-    DegreeName varchar  NOT NULL,
+    DegreeName varchar(40)  NOT NULL,
     CONSTRAINT Degrees_pk PRIMARY KEY  (DegreeID)
 );
 
@@ -92,14 +92,14 @@ CREATE TABLE Employees (
 -- Table: FormOfActivity
 CREATE TABLE FormOfActivity (
     ActivityTypeID int  NOT NULL,
-    TypeName varchar  NOT NULL,
+    TypeName varchar(40)  NOT NULL,
     CONSTRAINT FormOfActivity_pk PRIMARY KEY  (ActivityTypeID)
 );
 
 -- Table: Grades
 CREATE TABLE Grades (
     GradeID int  NOT NULL,
-    GradeName varchar  NOT NULL,
+    GradeName varchar(40)  NOT NULL,
     CONSTRAINT Grades_pk PRIMARY KEY  (GradeID)
 );
 
@@ -128,7 +128,7 @@ CREATE TABLE InternshipPresence (
 -- Table: Languages
 CREATE TABLE Languages (
     LanguageID int  NOT NULL,
-    LanguageName varchar  NOT NULL,
+    LanguageName varchar(40)  NOT NULL,
     CONSTRAINT Languages_pk PRIMARY KEY  (LanguageID)
 );
 
@@ -136,10 +136,10 @@ CREATE TABLE Languages (
 CREATE TABLE MeetingDetails (
     MeetingID int  NOT NULL,
     MeetingType int  NOT NULL,
-    MeetingDescription varchar  NULL,
+    MeetingDescription varchar(128)  NULL,
     RoomID int  NOT NULL,
     NumberOfStudentsLimit int  NULL,
-    Link varchar  NULL,
+    Link varchar(128)  NULL,
     CONSTRAINT MeetingDetails_pk PRIMARY KEY  (MeetingID)
 );
 
@@ -162,23 +162,23 @@ CREATE TABLE Orders (
     EntryFeePaid date  NULL,
     PaymentDeferred bit  NOT NULL,
     DeferredDate date  NULL,
-    PaymentLink varchar  NULL,
-    PaymentStatus varchar  NULL,
+    PaymentLink varchar(128)  NULL,
+    PaymentStatus varchar(40)  NULL,
     CONSTRAINT Orders_pk PRIMARY KEY  (OrderID)
 );
 
 -- Table: Roles
 CREATE TABLE Roles (
     RoleID int  NOT NULL,
-    RoleName varchar  NOT NULL,
+    RoleName varchar(40)  NOT NULL,
     CONSTRAINT Roles_pk PRIMARY KEY  (RoleID)
 );
 
 -- Table: Rooms
 CREATE TABLE Rooms (
     RoomID int  NOT NULL,
-    RoomName varchar  NOT NULL,
-    Street varchar  NOT NULL,
+    RoomName varchar(40)  NOT NULL,
+    Street varchar(40)  NOT NULL,
     PostalCode varchar(6)  NOT NULL,
     CityID int  NOT NULL,
     Limit int  NOT NULL,
@@ -189,9 +189,9 @@ CREATE TABLE Rooms (
 CREATE TABLE Studies (
     StudiesID int  NOT NULL,
     StudiesCoordinatorID int  NOT NULL,
-    StudyName varchar  NOT NULL,
+    StudyName varchar(40)  NOT NULL,
     StudyPrice money  NOT NULL,
-    StudyDescription varchar  NOT NULL,
+    StudyDescription varchar(128)  NOT NULL,
     NumberOfTerms int  NOT NULL,
     CONSTRAINT Studies_pk PRIMARY KEY  (StudiesID)
 );
@@ -231,8 +231,8 @@ CREATE TABLE Subjects (
     SubjectID int  NOT NULL,
     StudiesID int  NOT NULL,
     TeacherID int  NOT NULL,
-    SubjectName varchar  NOT NULL,
-    SubjectDescription varchar  NOT NULL,
+    SubjectName varchar(40)  NOT NULL,
+    SubjectDescription varchar(128)  NOT NULL,
     NumberOfHoursInTerm int  NOT NULL,
     Term int  NOT NULL,
     CONSTRAINT Subjects_pk PRIMARY KEY  (SubjectID)
@@ -256,13 +256,13 @@ CREATE TABLE TranslatedLanguage (
 -- Table: Users
 CREATE TABLE Users (
     UserID int  NOT NULL,
-    FirstName varchar  NOT NULL,
-    LastName varchar  NOT NULL,
-    Street varchar  NOT NULL,
+    FirstName varchar(40)  NOT NULL,
+    LastName varchar(40)  NOT NULL,
+    Street varchar(40)  NOT NULL,
     PostalCode varchar(6)  NOT NULL,
     CityID int  NOT NULL,
-    Email varchar  NOT NULL,
-    Phone varchar  NOT NULL,
+    Email varchar(40)  NOT NULL,
+    Phone varchar(20)  NOT NULL,
     DateOfBirth date  NOT NULL,
     CONSTRAINT Users_pk PRIMARY KEY  (UserID)
 );
@@ -270,15 +270,15 @@ CREATE TABLE Users (
 -- Table: Webinars
 CREATE TABLE Webinars (
     WebinarID int  NOT NULL,
-    WebinarName varchar  NOT NULL,
-    WebinarDescription varchar  NOT NULL,
+    WebinarName varchar(40)  NOT NULL,
+    WebinarDescription varchar(128)  NOT NULL,
     TeacherID int  NOT NULL,
     Price money  NOT NULL,
     LanguageID int  NOT NULL,
     TranslatorID int  NULL,
     StartDate datetime  NOT NULL,
     EndDate datetime  NOT NULL,
-    VideoLink varchar  NULL,
+    VideoLink varchar(128)  NULL,
     CONSTRAINT Webinars_pk PRIMARY KEY  (WebinarID)
 );
 
