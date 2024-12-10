@@ -562,7 +562,7 @@ ALTER TABLE CourseSegmentDetails ADD CONSTRAINT CHK_CourseSegmentDetails_NumberO
 -- Brak dodatkowych wymagań
 
 -- Courses
-ALTER TABLE Courses ADD CONSTRAINT CHK_Courses_CoursePrice CHECK (CoursePrice > 0);
+ALTER TABLE Courses ADD CONSTRAINT CHK_Courses_CoursePrice CHECK (CoursePrice >= 0);
 
 -- Degrees
 ALTER TABLE Degrees ADD CONSTRAINT UQ_Degrees_DegreeName UNIQUE (DegreeName);
@@ -593,7 +593,7 @@ ALTER TABLE Languages ADD CONSTRAINT UQ_Languages_LanguageName UNIQUE (LanguageN
 ALTER TABLE MeetingDetails ADD CONSTRAINT CHK_MeetingDetails_NumberOfStudentsLimit CHECK (NumberOfStudentsLimit > 0 OR NumberOfStudentsLimit IS NULL);
 
 -- OrderDetails
-ALTER TABLE OrderDetails ADD CONSTRAINT CHK_OrderDetails_Price CHECK (Price > 0);
+ALTER TABLE OrderDetails ADD CONSTRAINT CHK_OrderDetails_Price CHECK (Price >= 0);
 
 -- Orders
 ALTER TABLE Orders ADD CONSTRAINT CHK_Orders_EntryFeePaid CHECK (EntryFeePaid <= OrderDate OR EntryFeePaid IS NULL);
@@ -605,7 +605,7 @@ ALTER TABLE Roles ADD CONSTRAINT UQ_Roles_RoleName UNIQUE (RoleName);
 ALTER TABLE Rooms ADD CONSTRAINT CHK_Rooms_Limit CHECK (Limit > 0);
 
 -- Studies
-ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_StudyPrice CHECK (StudyPrice > 0);
+ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_StudyPrice CHECK (StudyPrice >= 0);
 ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_NumberOfTerms CHECK (NumberOfTerms > 0);
 
 -- StudiesResults
@@ -616,6 +616,8 @@ ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_NumberOfTerms CHECK (NumberOfTerm
 
 -- StudyMeetings
 ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_StartEndTimes CHECK (StartTime < EndTime);
+ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_Price CHECK (MeetingPrice >= 0);
+ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_PriceForOthers CHECK (MeetingPriceForOthers >= 0);
 
 -- Subjects
 ALTER TABLE Subjects ADD CONSTRAINT CHK_Subjects_NumberOfHoursInTerm CHECK (NumberOfHoursInTerm > 0);
@@ -632,8 +634,7 @@ ALTER TABLE Users ADD CONSTRAINT CHK_Users_Email_LIKE CHECK (Email LIKE '%@%.%')
 
 -- Webinars
 ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_StartEndDates CHECK (StartDate < EndDate);
-ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_Price CHECK (Price > 0);
+ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_Price CHECK (Price >= 0);
 
 
 -- End of file.
-
