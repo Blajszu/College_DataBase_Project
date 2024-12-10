@@ -538,5 +538,103 @@ ALTER TABLE Webinars ADD CONSTRAINT Webinars_Languages
     FOREIGN KEY (LanguageID)
     REFERENCES Languages (LanguageID);
 
+
+
+
+-- Dodanie ograniczeń integralnościowych dla tabel
+
+-- ActivitiesTypes
+ALTER TABLE ActivitiesTypes ADD CONSTRAINT UQ_ActivitiesTypes_TypeName UNIQUE (TypeName);
+
+-- Cities
+ALTER TABLE Cities ADD CONSTRAINT UQ_Cities_CityName_CountryID UNIQUE (CityName, CountryID);
+ALTER TABLE Cities ADD CONSTRAINT CHK_Cities_PostalCode_LIKE CHECK (PostalCode LIKE '[0-9][0-9]-[0-9][0-9][0-9]');
+
+-- Countries
+ALTER TABLE Countries ADD CONSTRAINT UQ_Countries_CountryName UNIQUE (CountryName);
+
+-- CourseSegment
+ALTER TABLE CourseSegment ADD CONSTRAINT CHK_CourseSegment_StartEndDates CHECK (StartDate < EndDate);
+
+-- CourseSegmentDetails
+ALTER TABLE CourseSegmentDetails ADD CONSTRAINT CHK_CourseSegmentDetails_NumberOfStudentsLimit CHECK (NumberOfStudentsLimit > 0 OR NumberOfStudentsLimit IS NULL);
+
+-- CourseSegmentPresence
+-- Brak dodatkowych wymagań
+
+-- Courses
+ALTER TABLE Courses ADD CONSTRAINT CHK_Courses_CoursePrice CHECK (CoursePrice > 0);
+
+-- Degrees
+ALTER TABLE Degrees ADD CONSTRAINT UQ_Degrees_DegreeName UNIQUE (DegreeName);
+
+-- EmployeeRoles
+-- Brak dodatkowych wymagań
+
+-- Employees
+ALTER TABLE Employees ADD CONSTRAINT CHK_Employees_HireDate CHECK (HireDate <= GETDATE());
+
+-- FormOfActivity
+ALTER TABLE FormOfActivity ADD CONSTRAINT UQ_FormOfActivity_TypeName UNIQUE (TypeName);
+
+-- Grades
+ALTER TABLE Grades ADD CONSTRAINT UQ_Grades_GradeName UNIQUE (GradeName);
+
+-- Internship
+ALTER TABLE Internship ADD CONSTRAINT CHK_Internship_StartEndDates CHECK (StartDate < EndDate);
+ALTER TABLE Internship ADD CONSTRAINT CHK_Internship_NumerOfHours CHECK (NumerOfHours > 0);
+
+-- InternshipPresence
+-- Brak dodatkowych wymagań
+
+-- Languages
+ALTER TABLE Languages ADD CONSTRAINT UQ_Languages_LanguageName UNIQUE (LanguageName);
+
+-- MeetingDetails
+ALTER TABLE MeetingDetails ADD CONSTRAINT CHK_MeetingDetails_NumberOfStudentsLimit CHECK (NumberOfStudentsLimit > 0 OR NumberOfStudentsLimit IS NULL);
+
+-- OrderDetails
+ALTER TABLE OrderDetails ADD CONSTRAINT CHK_OrderDetails_Price CHECK (Price > 0);
+
+-- Orders
+ALTER TABLE Orders ADD CONSTRAINT CHK_Orders_EntryFeePaid CHECK (EntryFeePaid <= OrderDate OR EntryFeePaid IS NULL);
+
+-- Roles
+ALTER TABLE Roles ADD CONSTRAINT UQ_Roles_RoleName UNIQUE (RoleName);
+
+-- Rooms
+ALTER TABLE Rooms ADD CONSTRAINT CHK_Rooms_Limit CHECK (Limit > 0);
+
+-- Studies
+ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_StudyPrice CHECK (StudyPrice > 0);
+ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_NumberOfTerms CHECK (NumberOfTerms > 0);
+
+-- StudiesResults
+-- Brak dodatkowych wymagań
+
+-- StudyMeetingPresence
+-- Brak dodatkowych wymagań
+
+-- StudyMeetings
+ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_StartEndTimes CHECK (StartTime < EndTime);
+
+-- Subjects
+ALTER TABLE Subjects ADD CONSTRAINT CHK_Subjects_NumberOfHoursInTerm CHECK (NumberOfHoursInTerm > 0);
+
+-- SubjectsResults
+-- Brak dodatkowych wymagań
+
+-- TranslatedLanguage
+-- Brak dodatkowych wymagań
+
+-- Users
+ALTER TABLE Users ADD CONSTRAINT CHK_Users_DateOfBirth CHECK (DateOfBirth < GETDATE());
+ALTER TABLE Users ADD CONSTRAINT CHK_Users_Email_LIKE CHECK (Email LIKE '%@%.%');
+
+-- Webinars
+ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_StartEndDates CHECK (StartDate < EndDate);
+ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_Price CHECK (Price > 0);
+
+
 -- End of file.
 
