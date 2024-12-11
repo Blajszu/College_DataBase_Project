@@ -151,6 +151,7 @@ CREATE TABLE OrderDetails (
     TypeOfActivity int  NOT NULL,
     Price money  NOT NULL,
     PaidDate datetime  NOT NULL,
+    PaymentStatus varchar(40)  NULL,
     CONSTRAINT OrderDetails_pk PRIMARY KEY  (DetailID)
 );
 
@@ -163,7 +164,7 @@ CREATE TABLE Orders (
     PaymentDeferred bit  NOT NULL,
     DeferredDate date  NULL,
     PaymentLink varchar(128)  NULL,
-    PaymentStatus varchar(40)  NULL,
+    EntryFeePaidStatus varchar(40)  NULL,
     CONSTRAINT Orders_pk PRIMARY KEY  (OrderID)
 );
 

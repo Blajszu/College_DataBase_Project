@@ -19,7 +19,7 @@
         </Counter>
         <Counter>
             <Name>column</Name>
-            <Value>145</Value>
+            <Value>146</Value>
             <Prefix>c</Prefix>
         </Counter>
         <Counter>
@@ -971,10 +971,19 @@
                     <Properties/>
                 </Column>
                 <Column Id="c64">
-                    <Name>Paid</Name>
-                    <Type>bit</Type>
+                    <Name>PaidDate</Name>
+                    <Type>datetime</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
+                    <DefaultValue></DefaultValue>
+                    <CheckExpression></CheckExpression>
+                    <Properties/>
+                </Column>
+                <Column Id="c146">
+                    <Name>PaymentStatus</Name>
+                    <Type>varchar</Type>
+                    <Description></Description>
+                    <Nullable>true</Nullable>
                     <DefaultValue></DefaultValue>
                     <CheckExpression></CheckExpression>
                     <Properties/>
@@ -1033,6 +1042,15 @@
                     <CheckExpression></CheckExpression>
                     <Properties/>
                 </Column>
+                <Column Id="c72">
+                    <Name>EntryFeePaidStatus</Name>
+                    <Type>varchar</Type>
+                    <Description></Description>
+                    <Nullable>true</Nullable>
+                    <DefaultValue></DefaultValue>
+                    <CheckExpression></CheckExpression>
+                    <Properties/>
+                </Column>
                 <Column Id="c69">
                     <Name>PaymentDeferred</Name>
                     <Type>bit</Type>
@@ -1053,15 +1071,6 @@
                 </Column>
                 <Column Id="c71">
                     <Name>PaymentLink</Name>
-                    <Type>varchar</Type>
-                    <Description></Description>
-                    <Nullable>true</Nullable>
-                    <DefaultValue></DefaultValue>
-                    <CheckExpression></CheckExpression>
-                    <Properties/>
-                </Column>
-                <Column Id="c72">
-                    <Name>PaymentStatus</Name>
                     <Type>varchar</Type>
                     <Description></Description>
                     <Nullable>true</Nullable>
@@ -2860,12 +2869,12 @@
             <DisplayInfo>
                 <X>6519.5</X>
                 <Y>6936.5</Y>
-                <Width>467.0</Width>
+                <Width>479.0</Width>
                 <Height>379.0</Height>
                 <LineColor>#FFFFFF</LineColor>
                 <FillColor>#FFD966</FillColor>
                 <DashArray>[0]</DashArray>
-                <NameX>382.8251953125</NameX>
+                <NameX>394.8251953125</NameX>
                 <NameY>344.0</NameY>
                 <NameColor>#FFFFFF</NameColor>
                 <ZIndex>2</ZIndex>
@@ -3107,8 +3116,8 @@
         <TableDisplay Id="td16">
             <X>6548.5</X>
             <Y>7011.5</Y>
-            <Width>170.0</Width>
-            <Height>120.0</Height>
+            <Width>182.0</Width>
+            <Height>135.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
             <Table>t16</Table>
@@ -3117,7 +3126,7 @@
         <TableDisplay Id="td17">
             <X>6769.5</X>
             <Y>7060.5</Y>
-            <Width>196.0</Width>
+            <Width>207.0</Width>
             <Height>145.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
