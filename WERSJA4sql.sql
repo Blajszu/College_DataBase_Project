@@ -150,7 +150,7 @@ CREATE TABLE OrderDetails (
     ActivityID int  NOT NULL,
     TypeOfActivity int  NOT NULL,
     Price money  NOT NULL,
-    Paid bit  NOT NULL,
+    PaidDate datetime  NOT NULL,
     CONSTRAINT OrderDetails_pk PRIMARY KEY  (DetailID)
 );
 
