@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-12-10 19:05:19.129
+-- Last modification date: 2024-12-17 08:35:43.981
 
 -- tables
 -- Table: ActivitiesTypes
@@ -24,37 +24,24 @@ CREATE TABLE Countries (
     CONSTRAINT Countries_pk PRIMARY KEY  (CountryID)
 );
 
--- Table: CourseSegment
-CREATE TABLE CourseSegment (
-    SegmentID int  NOT NULL,
+-- Table: CourseModules
+CREATE TABLE CourseModules (
+    ModuleID int  NOT NULL,
     CourseID int  NOT NULL,
-    SegmentName varchar(40)  NOT NULL,
-    SegmentType int  NOT NULL,
+    ModuleName varchar(40)  NOT NULL,
+    ModuleType int  NOT NULL,
     LecturerID int  NOT NULL,
-    StartDate datetime  NOT NULL,
-    EndDate datetime  NOT NULL,
     LanguageID int  NOT NULL,
     TranslatorID int  NULL,
-    CONSTRAINT CourseSegment_pk PRIMARY KEY  (SegmentID)
+    CONSTRAINT CourseSegment_pk PRIMARY KEY  (ModuleID)
 );
 
--- Table: CourseSegmentDetails
-CREATE TABLE CourseSegmentDetails (
-    SegmentID int  NOT NULL,
-    SegmentType int  NOT NULL,
-    SegmentDescription varchar(128)  NULL,
-    RoomID int  NOT NULL,
-    NumberOfStudentsLimit int  NULL,
-    Link varchar(128)  NULL,
-    CONSTRAINT CourseSegmentDetails_pk PRIMARY KEY  (SegmentID)
-);
-
--- Table: CourseSegmentPresence
-CREATE TABLE CourseSegmentPresence (
-    SegmentID int  NOT NULL,
-    UserID int  NOT NULL,
-    Presence bit  NOT NULL,
-    CONSTRAINT CourseSegmentPresence_pk PRIMARY KEY  (SegmentID,UserID)
+-- Table: CourseModulesPassed
+CREATE TABLE CourseModulesPassed (
+    ModuleID int  NOT NULL,
+    StudentID int  NOT NULL,
+    Passed bit  NOT NULL,
+    CONSTRAINT StudyMeetingPresence_pk PRIMARY KEY  (ModuleID,StudentID)
 );
 
 -- Table: Courses
@@ -62,8 +49,9 @@ CREATE TABLE Courses (
     CourseID int  NOT NULL,
     CourseName varchar(40)  NOT NULL,
     CourseCoordinatorID int  NOT NULL,
-    CourseDescription varchar(128)  NOT NULL,
+    CourseDescription varchar(255)  NOT NULL,
     CoursePrice money  NOT NULL,
+    StudentLimit int  NULL,
     CONSTRAINT Courses_pk PRIMARY KEY  (CourseID)
 );
 
@@ -72,13 +60,6 @@ CREATE TABLE Degrees (
     DegreeID int  NOT NULL,
     DegreeName varchar(40)  NOT NULL,
     CONSTRAINT Degrees_pk PRIMARY KEY  (DegreeID)
-);
-
--- Table: EmployeeRoles
-CREATE TABLE EmployeeRoles (
-    EmployeeID int  NOT NULL,
-    RoleID int  NOT NULL,
-    CONSTRAINT EmployeeRoles_pk PRIMARY KEY  (EmployeeID,RoleID)
 );
 
 -- Table: Employees
@@ -115,14 +96,12 @@ CREATE TABLE Internship (
     CONSTRAINT Internship_pk PRIMARY KEY  (InternshipID)
 );
 
--- Table: InternshipPresence
-CREATE TABLE InternshipPresence (
-    PresenceID int  NOT NULL,
+-- Table: InternshipPassed
+CREATE TABLE InternshipPassed (
     InternshipID int  NOT NULL,
     StudentID int  NOT NULL,
-    Date date  NOT NULL,
-    Presence bit  NOT NULL,
-    CONSTRAINT InternshipPresence_pk PRIMARY KEY  (PresenceID)
+    Passed bit  NOT NULL,
+    CONSTRAINT InternshipPresence_pk PRIMARY KEY  (InternshipID,StudentID)
 );
 
 -- Table: Languages
@@ -132,15 +111,23 @@ CREATE TABLE Languages (
     CONSTRAINT Languages_pk PRIMARY KEY  (LanguageID)
 );
 
--- Table: MeetingDetails
-CREATE TABLE MeetingDetails (
+-- Table: OnlineCourseMeeting
+CREATE TABLE OnlineCourseMeeting (
     MeetingID int  NOT NULL,
-    MeetingType int  NOT NULL,
-    MeetingDescription varchar(128)  NULL,
-    RoomID int  NOT NULL,
-    NumberOfStudentsLimit int  NULL,
-    Link varchar(128)  NULL,
-    CONSTRAINT MeetingDetails_pk PRIMARY KEY  (MeetingID)
+    ModuleID int  NOT NULL,
+    StartDate datetime  NOT NULL,
+    EndDate datetime  NOT NULL,
+    MeetingLink int  NULL,
+    VideoLink int  NULL,
+    CONSTRAINT OnlineCourseMeeting_pk PRIMARY KEY  (MeetingID)
+);
+
+-- Table: OnlineMeetings
+CREATE TABLE OnlineMeetings (
+    MeetingID int  NOT NULL,
+    MeetingLink int  NULL,
+    StudentLimit int  NOT NULL,
+    CONSTRAINT OnlineMeetings_pk PRIMARY KEY  (MeetingID)
 );
 
 -- Table: OrderDetails
@@ -150,7 +137,7 @@ CREATE TABLE OrderDetails (
     ActivityID int  NOT NULL,
     TypeOfActivity int  NOT NULL,
     Price money  NOT NULL,
-    PaidDate datetime  NOT NULL,
+    PaidDate datetime  NULL,
     PaymentStatus varchar(40)  NULL,
     CONSTRAINT OrderDetails_pk PRIMARY KEY  (DetailID)
 );
@@ -160,12 +147,19 @@ CREATE TABLE Orders (
     OrderID int  NOT NULL,
     StudentID int  NOT NULL,
     OrderDate datetime  NOT NULL,
-    EntryFeePaid date  NULL,
     PaymentDeferred bit  NOT NULL,
     DeferredDate date  NULL,
-    PaymentLink varchar(128)  NULL,
-    EntryFeePaidStatus varchar(40)  NULL,
+    PaymentLink varchar(255)  NULL,
     CONSTRAINT Orders_pk PRIMARY KEY  (OrderID)
+);
+
+-- Table: PaymentsAdvances
+CREATE TABLE PaymentsAdvances (
+    DetailID int  NOT NULL,
+    AdvancePrice money  NOT NULL,
+    AdvancePaidDate datetime  NULL,
+    AdvancePaymentStatus varchar(40)  NULL,
+    CONSTRAINT PaymentsAdvances_pk PRIMARY KEY  (DetailID)
 );
 
 -- Table: Roles
@@ -186,14 +180,33 @@ CREATE TABLE Rooms (
     CONSTRAINT Rooms_pk PRIMARY KEY  (RoomID)
 );
 
+-- Table: StationaryCourseMeeting
+CREATE TABLE StationaryCourseMeeting (
+    MeetingID int  NOT NULL,
+    ModuleID int  NOT NULL,
+    RoomID int  NOT NULL,
+    StartDate datetime  NOT NULL,
+    EndDate datetime  NOT NULL,
+    CONSTRAINT StationaryCourseMeeting_pk PRIMARY KEY  (MeetingID)
+);
+
+-- Table: StationaryMeetings
+CREATE TABLE StationaryMeetings (
+    MeetingID int  NOT NULL,
+    RoomID int  NOT NULL,
+    StudentLimit int  NOT NULL,
+    CONSTRAINT StationaryMeetings_pk PRIMARY KEY  (MeetingID)
+);
+
 -- Table: Studies
 CREATE TABLE Studies (
     StudiesID int  NOT NULL,
     StudiesCoordinatorID int  NOT NULL,
     StudyName varchar(40)  NOT NULL,
     StudyPrice money  NOT NULL,
-    StudyDescription varchar(128)  NOT NULL,
+    StudyDescription varchar(255)  NOT NULL,
     NumberOfTerms int  NOT NULL,
+    StudentLimit int  NOT NULL,
     CONSTRAINT Studies_pk PRIMARY KEY  (StudiesID)
 );
 
@@ -203,6 +216,16 @@ CREATE TABLE StudiesResults (
     StudentID int  NOT NULL,
     GradeID int  NOT NULL,
     CONSTRAINT StudiesResults_pk PRIMARY KEY  (StudiesID,StudentID)
+);
+
+-- Table: StudyMeetingPayment
+CREATE TABLE StudyMeetingPayment (
+    DetailID int  NOT NULL,
+    MeetingID int  NOT NULL,
+    Price money  NOT NULL,
+    PaidDate datetime  NULL,
+    PaymentStatus varchar(40)  NULL,
+    CONSTRAINT StudyMeetingPayment_pk PRIMARY KEY  (DetailID)
 );
 
 -- Table: StudyMeetingPresence
@@ -218,6 +241,7 @@ CREATE TABLE StudyMeetings (
     MeetingID int  NOT NULL,
     SubjectID int  NOT NULL,
     LecturerID int  NOT NULL,
+    MeetingType int  NOT NULL,
     MeetingPrice money  NOT NULL,
     MeetingPriceForOthers money  NOT NULL,
     StartTime datetime  NOT NULL,
@@ -233,7 +257,7 @@ CREATE TABLE Subjects (
     StudiesID int  NOT NULL,
     TeacherID int  NOT NULL,
     SubjectName varchar(40)  NOT NULL,
-    SubjectDescription varchar(128)  NOT NULL,
+    SubjectDescription varchar(255)  NOT NULL,
     NumberOfHoursInTerm int  NOT NULL,
     Term int  NOT NULL,
     CONSTRAINT Subjects_pk PRIMARY KEY  (SubjectID)
@@ -263,23 +287,31 @@ CREATE TABLE Users (
     PostalCode varchar(6)  NOT NULL,
     CityID int  NOT NULL,
     Email varchar(40)  NOT NULL,
-    Phone varchar(20)  NOT NULL,
+    Phone varchar(40)  NOT NULL,
     DateOfBirth date  NOT NULL,
     CONSTRAINT Users_pk PRIMARY KEY  (UserID)
+);
+
+-- Table: UsersRoles
+CREATE TABLE UsersRoles (
+    UserID int  NOT NULL,
+    RoleID int  NOT NULL,
+    CONSTRAINT EmployeeRoles_pk PRIMARY KEY  (UserID,RoleID)
 );
 
 -- Table: Webinars
 CREATE TABLE Webinars (
     WebinarID int  NOT NULL,
     WebinarName varchar(40)  NOT NULL,
-    WebinarDescription varchar(128)  NOT NULL,
+    WebinarDescription varchar(255)  NOT NULL,
     TeacherID int  NOT NULL,
-    Price money  NOT NULL,
+    Price money  NULL,
     LanguageID int  NOT NULL,
     TranslatorID int  NULL,
     StartDate datetime  NOT NULL,
     EndDate datetime  NOT NULL,
-    VideoLink varchar(128)  NULL,
+    VideoLink varchar(255)  NULL,
+    MeetingLink varchar(255)  NULL,
     CONSTRAINT Webinars_pk PRIMARY KEY  (WebinarID)
 );
 
@@ -294,33 +326,28 @@ ALTER TABLE Cities ADD CONSTRAINT Country_City
     FOREIGN KEY (CountryID)
     REFERENCES Countries (CountryID);
 
--- Reference: CourseSegmentDetails_CourseSegment (table: CourseSegmentDetails)
-ALTER TABLE CourseSegmentDetails ADD CONSTRAINT CourseSegmentDetails_CourseSegment
-    FOREIGN KEY (SegmentID)
-    REFERENCES CourseSegment (SegmentID);
+-- Reference: CourseModulesPassed_CourseModules (table: CourseModulesPassed)
+ALTER TABLE CourseModulesPassed ADD CONSTRAINT CourseModulesPassed_CourseModules
+    FOREIGN KEY (ModuleID)
+    REFERENCES CourseModules (ModuleID);
 
--- Reference: CourseSegmentPresence_CourseSegment (table: CourseSegmentPresence)
-ALTER TABLE CourseSegmentPresence ADD CONSTRAINT CourseSegmentPresence_CourseSegment
-    FOREIGN KEY (SegmentID)
-    REFERENCES CourseSegment (SegmentID);
-
--- Reference: CourseSegmentPresence_Users (table: CourseSegmentPresence)
-ALTER TABLE CourseSegmentPresence ADD CONSTRAINT CourseSegmentPresence_Users
-    FOREIGN KEY (UserID)
+-- Reference: CourseModulesPassed_Users (table: CourseModulesPassed)
+ALTER TABLE CourseModulesPassed ADD CONSTRAINT CourseModulesPassed_Users
+    FOREIGN KEY (StudentID)
     REFERENCES Users (UserID);
 
--- Reference: CourseSegment_Courses (table: CourseSegment)
-ALTER TABLE CourseSegment ADD CONSTRAINT CourseSegment_Courses
+-- Reference: CourseSegment_Courses (table: CourseModules)
+ALTER TABLE CourseModules ADD CONSTRAINT CourseSegment_Courses
     FOREIGN KEY (CourseID)
     REFERENCES Courses (CourseID);
 
--- Reference: CourseSegment_Employees (table: CourseSegment)
-ALTER TABLE CourseSegment ADD CONSTRAINT CourseSegment_Employees
+-- Reference: CourseSegment_Employees (table: CourseModules)
+ALTER TABLE CourseModules ADD CONSTRAINT CourseSegment_Employees
     FOREIGN KEY (LecturerID)
     REFERENCES Employees (EmployeeID);
 
--- Reference: CourseSegment_Employees_1 (table: CourseSegment)
-ALTER TABLE CourseSegment ADD CONSTRAINT CourseSegment_Employees_1
+-- Reference: CourseSegment_Employees_1 (table: CourseModules)
+ALTER TABLE CourseModules ADD CONSTRAINT CourseSegment_Employees_1
     FOREIGN KEY (TranslatorID)
     REFERENCES Employees (EmployeeID);
 
@@ -329,13 +356,8 @@ ALTER TABLE Courses ADD CONSTRAINT Courses_Employees
     FOREIGN KEY (CourseCoordinatorID)
     REFERENCES Employees (EmployeeID);
 
--- Reference: EmployeeRoles_Employees (table: EmployeeRoles)
-ALTER TABLE EmployeeRoles ADD CONSTRAINT EmployeeRoles_Employees
-    FOREIGN KEY (EmployeeID)
-    REFERENCES Employees (EmployeeID);
-
--- Reference: EmployeeRoles_Roles (table: EmployeeRoles)
-ALTER TABLE EmployeeRoles ADD CONSTRAINT EmployeeRoles_Roles
+-- Reference: EmployeeRoles_Roles (table: UsersRoles)
+ALTER TABLE UsersRoles ADD CONSTRAINT EmployeeRoles_Roles
     FOREIGN KEY (RoleID)
     REFERENCES Roles (RoleID);
 
@@ -349,13 +371,18 @@ ALTER TABLE Employees ADD CONSTRAINT Employees_Users
     FOREIGN KEY (EmployeeID)
     REFERENCES Users (UserID);
 
--- Reference: FormOfActivity_CourseSegmentDetails (table: CourseSegmentDetails)
-ALTER TABLE CourseSegmentDetails ADD CONSTRAINT FormOfActivity_CourseSegmentDetails
-    FOREIGN KEY (SegmentType)
+-- Reference: FormOfActivity_CourseModules (table: CourseModules)
+ALTER TABLE CourseModules ADD CONSTRAINT FormOfActivity_CourseModules
+    FOREIGN KEY (ModuleType)
     REFERENCES FormOfActivity (ActivityTypeID);
 
--- Reference: InternshipPresence_Users (table: InternshipPresence)
-ALTER TABLE InternshipPresence ADD CONSTRAINT InternshipPresence_Users
+-- Reference: FormOfActivity_StudyMeetings (table: StudyMeetings)
+ALTER TABLE StudyMeetings ADD CONSTRAINT FormOfActivity_StudyMeetings
+    FOREIGN KEY (MeetingType)
+    REFERENCES FormOfActivity (ActivityTypeID);
+
+-- Reference: InternshipPresence_Users (table: InternshipPassed)
+ALTER TABLE InternshipPassed ADD CONSTRAINT InternshipPresence_Users
     FOREIGN KEY (StudentID)
     REFERENCES Users (UserID);
 
@@ -364,8 +391,8 @@ ALTER TABLE Internship ADD CONSTRAINT Internship_Employees
     FOREIGN KEY (InternshipCoordinatorID)
     REFERENCES Employees (EmployeeID);
 
--- Reference: Internship_InternshipPresence (table: InternshipPresence)
-ALTER TABLE InternshipPresence ADD CONSTRAINT Internship_InternshipPresence
+-- Reference: Internship_InternshipPresence (table: InternshipPassed)
+ALTER TABLE InternshipPassed ADD CONSTRAINT Internship_InternshipPresence
     FOREIGN KEY (InternshipID)
     REFERENCES Internship (InternshipID);
 
@@ -374,20 +401,20 @@ ALTER TABLE Internship ADD CONSTRAINT Internship_Studies
     FOREIGN KEY (StudiesID)
     REFERENCES Studies (StudiesID);
 
--- Reference: Languages_CourseSegment (table: CourseSegment)
-ALTER TABLE CourseSegment ADD CONSTRAINT Languages_CourseSegment
+-- Reference: Languages_CourseSegment (table: CourseModules)
+ALTER TABLE CourseModules ADD CONSTRAINT Languages_CourseSegment
     FOREIGN KEY (LanguageID)
     REFERENCES Languages (LanguageID);
 
--- Reference: MeetingDetails_StudyMeetings (table: MeetingDetails)
-ALTER TABLE MeetingDetails ADD CONSTRAINT MeetingDetails_StudyMeetings
+-- Reference: OnlineMeetings_StudyMeetings (table: OnlineMeetings)
+ALTER TABLE OnlineMeetings ADD CONSTRAINT OnlineMeetings_StudyMeetings
     FOREIGN KEY (MeetingID)
     REFERENCES StudyMeetings (MeetingID);
 
--- Reference: MeetingTypes_MeetingDetails (table: MeetingDetails)
-ALTER TABLE MeetingDetails ADD CONSTRAINT MeetingTypes_MeetingDetails
-    FOREIGN KEY (MeetingType)
-    REFERENCES FormOfActivity (ActivityTypeID);
+-- Reference: OnlineModules_CourseModules (table: OnlineCourseMeeting)
+ALTER TABLE OnlineCourseMeeting ADD CONSTRAINT OnlineModules_CourseModules
+    FOREIGN KEY (ModuleID)
+    REFERENCES CourseModules (ModuleID);
 
 -- Reference: OrderDetails_ActivitiesTypes (table: OrderDetails)
 ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_ActivitiesTypes
@@ -404,6 +431,11 @@ ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_Studies
     FOREIGN KEY (ActivityID)
     REFERENCES Studies (StudiesID);
 
+-- Reference: OrderDetails_StudyMeetingPayment (table: StudyMeetingPayment)
+ALTER TABLE StudyMeetingPayment ADD CONSTRAINT OrderDetails_StudyMeetingPayment
+    FOREIGN KEY (DetailID)
+    REFERENCES OrderDetails (DetailID);
+
 -- Reference: OrderDetails_StudyMeetings (table: OrderDetails)
 ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_StudyMeetings
     FOREIGN KEY (ActivityID)
@@ -419,18 +451,33 @@ ALTER TABLE OrderDetails ADD CONSTRAINT Orders_OrderDetails
     FOREIGN KEY (OrderID)
     REFERENCES Orders (OrderID);
 
+-- Reference: PaymentsAdvances_OrderDetails (table: PaymentsAdvances)
+ALTER TABLE PaymentsAdvances ADD CONSTRAINT PaymentsAdvances_OrderDetails
+    FOREIGN KEY (DetailID)
+    REFERENCES OrderDetails (DetailID);
+
 -- Reference: Rooms_Cities (table: Rooms)
 ALTER TABLE Rooms ADD CONSTRAINT Rooms_Cities
     FOREIGN KEY (CityID)
     REFERENCES Cities (CityID);
 
--- Reference: Rooms_CourseSegmentDetails (table: CourseSegmentDetails)
-ALTER TABLE CourseSegmentDetails ADD CONSTRAINT Rooms_CourseSegmentDetails
+-- Reference: StationaryMeetings_Rooms (table: StationaryMeetings)
+ALTER TABLE StationaryMeetings ADD CONSTRAINT StationaryMeetings_Rooms
     FOREIGN KEY (RoomID)
     REFERENCES Rooms (RoomID);
 
--- Reference: Rooms_MeetingDetails (table: MeetingDetails)
-ALTER TABLE MeetingDetails ADD CONSTRAINT Rooms_MeetingDetails
+-- Reference: StationaryMeetings_StudyMeetings (table: StationaryMeetings)
+ALTER TABLE StationaryMeetings ADD CONSTRAINT StationaryMeetings_StudyMeetings
+    FOREIGN KEY (MeetingID)
+    REFERENCES StudyMeetings (MeetingID);
+
+-- Reference: StationaryModules_CourseModules (table: StationaryCourseMeeting)
+ALTER TABLE StationaryCourseMeeting ADD CONSTRAINT StationaryModules_CourseModules
+    FOREIGN KEY (ModuleID)
+    REFERENCES CourseModules (ModuleID);
+
+-- Reference: StationaryModules_Rooms (table: StationaryCourseMeeting)
+ALTER TABLE StationaryCourseMeeting ADD CONSTRAINT StationaryModules_Rooms
     FOREIGN KEY (RoomID)
     REFERENCES Rooms (RoomID);
 
@@ -474,6 +521,11 @@ ALTER TABLE StudyMeetingPresence ADD CONSTRAINT StudyMeetings_Presence
     FOREIGN KEY (StudyMeetingID)
     REFERENCES StudyMeetings (MeetingID);
 
+-- Reference: StudyMeetings_StudyMeetingPayment (table: StudyMeetingPayment)
+ALTER TABLE StudyMeetingPayment ADD CONSTRAINT StudyMeetings_StudyMeetingPayment
+    FOREIGN KEY (MeetingID)
+    REFERENCES StudyMeetings (MeetingID);
+
 -- Reference: StudyMeetings_Subjects (table: StudyMeetings)
 ALTER TABLE StudyMeetings ADD CONSTRAINT StudyMeetings_Subjects
     FOREIGN KEY (SubjectID)
@@ -509,6 +561,11 @@ ALTER TABLE TranslatedLanguage ADD CONSTRAINT TranslatedLanguage_Languages
     FOREIGN KEY (LanguageID)
     REFERENCES Languages (LanguageID);
 
+-- Reference: UsersRoles_Users (table: UsersRoles)
+ALTER TABLE UsersRoles ADD CONSTRAINT UsersRoles_Users
+    FOREIGN KEY (UserID)
+    REFERENCES Users (UserID);
+
 -- Reference: Users_Orders (table: Orders)
 ALTER TABLE Orders ADD CONSTRAINT Users_Orders
     FOREIGN KEY (StudentID)
@@ -539,9 +596,6 @@ ALTER TABLE Webinars ADD CONSTRAINT Webinars_Languages
     FOREIGN KEY (LanguageID)
     REFERENCES Languages (LanguageID);
 
-
-
-
 -- Dodanie ograniczeń integralnościowych dla tabel
 
 -- ActivitiesTypes
@@ -553,23 +607,18 @@ ALTER TABLE Cities ADD CONSTRAINT UQ_Cities_CityName_CountryID UNIQUE (CityName,
 -- Countries
 ALTER TABLE Countries ADD CONSTRAINT UQ_Countries_CountryName UNIQUE (CountryName);
 
--- CourseSegment
-ALTER TABLE CourseSegment ADD CONSTRAINT CHK_CourseSegment_StartEndDates CHECK (StartDate < EndDate);
+-- StationaryCourseMeeting
+ALTER TABLE StationaryCourseMeeting ADD CONSTRAINT CHK_StationaryCourseMeeting_StartEndDates CHECK (StartDate < EndDate);
 
--- CourseSegmentDetails
-ALTER TABLE CourseSegmentDetails ADD CONSTRAINT CHK_CourseSegmentDetails_NumberOfStudentsLimit CHECK (NumberOfStudentsLimit > 0 OR NumberOfStudentsLimit IS NULL);
-
--- CourseSegmentPresence
--- Brak dodatkowych wymagań
+-- OnlineCourseMeeting
+ALTER TABLE OnlineCourseMeeting ADD CONSTRAINT CHK_OnlineCourseMeeting_StartEndDates CHECK (StartDate < EndDate);
 
 -- Courses
 ALTER TABLE Courses ADD CONSTRAINT CHK_Courses_CoursePrice CHECK (CoursePrice >= 0);
+ALTER TABLE Courses ADD CONSTRAINT CHK_Courses_NumberOfStudentsLimit CHECK (StudentLimit > 0 OR StudentLimit IS NULL);
 
 -- Degrees
 ALTER TABLE Degrees ADD CONSTRAINT UQ_Degrees_DegreeName UNIQUE (DegreeName);
-
--- EmployeeRoles
--- Brak dodatkowych wymagań
 
 -- Employees
 ALTER TABLE Employees ADD CONSTRAINT CHK_Employees_HireDate CHECK (HireDate <= GETDATE());
@@ -584,20 +633,17 @@ ALTER TABLE Grades ADD CONSTRAINT UQ_Grades_GradeName UNIQUE (GradeName);
 ALTER TABLE Internship ADD CONSTRAINT CHK_Internship_StartEndDates CHECK (StartDate < EndDate);
 ALTER TABLE Internship ADD CONSTRAINT CHK_Internship_NumerOfHours CHECK (NumerOfHours > 0);
 
--- InternshipPresence
--- Brak dodatkowych wymagań
-
 -- Languages
 ALTER TABLE Languages ADD CONSTRAINT UQ_Languages_LanguageName UNIQUE (LanguageName);
 
--- MeetingDetails
-ALTER TABLE MeetingDetails ADD CONSTRAINT CHK_MeetingDetails_NumberOfStudentsLimit CHECK (NumberOfStudentsLimit > 0 OR NumberOfStudentsLimit IS NULL);
+-- StationaryMeetings
+ALTER TABLE StationaryMeetings ADD CONSTRAINT CHK_StationaryMeetings_StudentLimit CHECK (StudentLimit > 0);
+
+-- OnlineMeetings
+ALTER TABLE OnlineMeetings ADD CONSTRAINT CHK_OnlineMeetings_StudentLimit CHECK (StudentLimit > 0 OR StudentLimit IS NULL);
 
 -- OrderDetails
 ALTER TABLE OrderDetails ADD CONSTRAINT CHK_OrderDetails_Price CHECK (Price >= 0);
-
--- Orders
-ALTER TABLE Orders ADD CONSTRAINT CHK_Orders_EntryFeePaid CHECK (EntryFeePaid <= OrderDate OR EntryFeePaid IS NULL);
 
 -- Roles
 ALTER TABLE Roles ADD CONSTRAINT UQ_Roles_RoleName UNIQUE (RoleName);
@@ -609,12 +655,6 @@ ALTER TABLE Rooms ADD CONSTRAINT CHK_Rooms_Limit CHECK (Limit > 0);
 ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_StudyPrice CHECK (StudyPrice >= 0);
 ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_NumberOfTerms CHECK (NumberOfTerms > 0);
 
--- StudiesResults
--- Brak dodatkowych wymagań
-
--- StudyMeetingPresence
--- Brak dodatkowych wymagań
-
 -- StudyMeetings
 ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_StartEndTimes CHECK (StartTime < EndTime);
 ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_Price CHECK (MeetingPrice >= 0);
@@ -622,12 +662,6 @@ ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_PriceForOthers CHECK 
 
 -- Subjects
 ALTER TABLE Subjects ADD CONSTRAINT CHK_Subjects_NumberOfHoursInTerm CHECK (NumberOfHoursInTerm > 0);
-
--- SubjectsResults
--- Brak dodatkowych wymagań
-
--- TranslatedLanguage
--- Brak dodatkowych wymagań
 
 -- Users
 ALTER TABLE Users ADD CONSTRAINT CHK_Users_DateOfBirth CHECK (DateOfBirth < GETDATE());
@@ -637,5 +671,8 @@ ALTER TABLE Users ADD CONSTRAINT CHK_Users_Email_LIKE CHECK (Email LIKE '%@%.%')
 ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_StartEndDates CHECK (StartDate < EndDate);
 ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_Price CHECK (Price >= 0);
 
+-- PaymentsAdvances
+ALTER TABLE PaymentsAdvances
+ADD CONSTRAINT CHK_PaymentsAdvances_AdvancePrice CHECK (AdvancePrice >= 0);
 
 -- End of file.
