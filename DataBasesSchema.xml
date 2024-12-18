@@ -3019,7 +3019,7 @@
                     <FKColumn>c179</FKColumn>
                 </ReferenceColumn>
             </ReferenceColumns>
-            <Cardinality>0..*</Cardinality>
+            <Cardinality>0..1</Cardinality>
             <Mandatory>true</Mandatory>
             <OnUpdateAction>None</OnUpdateAction>
             <OnDeleteAction>None</OnDeleteAction>
@@ -3038,7 +3038,7 @@
                     <FKColumn>c182</FKColumn>
                 </ReferenceColumn>
             </ReferenceColumns>
-            <Cardinality>0..*</Cardinality>
+            <Cardinality>0..1</Cardinality>
             <Mandatory>true</Mandatory>
             <OnUpdateAction>None</OnUpdateAction>
             <OnDeleteAction>None</OnDeleteAction>
