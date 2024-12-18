@@ -666,6 +666,7 @@ ALTER TABLE Subjects ADD CONSTRAINT CHK_Subjects_NumberOfHoursInTerm CHECK (Numb
 -- Users
 ALTER TABLE Users ADD CONSTRAINT CHK_Users_DateOfBirth CHECK (DateOfBirth < GETDATE());
 ALTER TABLE Users ADD CONSTRAINT CHK_Users_Email_LIKE CHECK (Email LIKE '%@%.%');
+ALTER TABLE Users ADD CONSTRAINT UQ_Users_Email UNIQUE (Email);
 
 -- Webinars
 ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_StartEndDates CHECK (StartDate < EndDate);
