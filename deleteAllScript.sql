@@ -1,18 +1,47 @@
-declare @sql nvarchar(max) = (
-    select 
-        'alter table ' + quotename(schema_name(schema_id)) + '.' +
-        quotename(object_name(parent_object_id)) +
-        ' drop constraint '+quotename(name) + ';'
-    from sys.foreign_keys
-    for xml path('')
+-- Usuwanie kluczy obcych
+DECLARE @sql NVARCHAR(MAX) = (
+    SELECT 
+        STRING_AGG(
+            'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + 
+            QUOTENAME(OBJECT_NAME(parent_object_id)) +
+            ' DROP CONSTRAINT ' + QUOTENAME(name) + ';',
+            CHAR(10)
+        )
+    FROM sys.foreign_keys
 );
-exec sp_executesql @sql;
 
+-- Wykonanie skryptu usuwającego klucze obce
+IF @sql IS NOT NULL
+    EXEC sp_executesql @sql;
 
-DECLARE @sql NVARCHAR(max)=''
+-- Usuwanie kluczy głównych
+SET @sql = (
+    SELECT 
+        STRING_AGG(
+            'ALTER TABLE ' + QUOTENAME(TABLE_SCHEMA) + '.' + 
+            QUOTENAME(TABLE_NAME) +
+            ' DROP CONSTRAINT ' + QUOTENAME(CONSTRAINT_NAME) + ';',
+            CHAR(10)
+        )
+    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+    WHERE CONSTRAINT_TYPE = 'PRIMARY KEY'
+);
 
-SELECT @sql += ' Drop table ' + QUOTENAME(TABLE_SCHEMA) + '.'+ QUOTENAME(TABLE_NAME) + '; '
-FROM   INFORMATION_SCHEMA.TABLES
-WHERE  TABLE_TYPE = 'BASE TABLE'
+-- Wykonanie skryptu usuwającego klucze główne
+IF @sql IS NOT NULL
+    EXEC sp_executesql @sql;
 
-Exec Sp_executesql @sql
+-- Usuwanie tabel
+SET @sql = (
+    SELECT 
+        STRING_AGG(
+            'DROP TABLE ' + QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) + ';',
+            CHAR(10)
+        )
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_TYPE = 'BASE TABLE'
+);
+
+-- Wykonanie skryptu usuwającego tabele
+IF @sql IS NOT NULL
+    EXEC sp_executesql @sql;
