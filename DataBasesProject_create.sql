@@ -4,14 +4,14 @@
 -- tables
 -- Table: ActivitiesTypes
 CREATE TABLE ActivitiesTypes (
-    ActivityTypeID int  NOT NULL,
+    ActivityTypeID int  NOT NULL IDENTITY(1,1),
     TypeName varchar(40)  NOT NULL,
     CONSTRAINT ActivitiesTypes_pk PRIMARY KEY  (ActivityTypeID)
 );
 
 -- Table: Cities
 CREATE TABLE Cities (
-    CityID int  NOT NULL,
+    CityID int  NOT NULL IDENTITY(1,1),
     CityName varchar(40)  NOT NULL,
     CountryID int  NOT NULL,
     CONSTRAINT Cities_pk PRIMARY KEY  (CityID)
@@ -19,14 +19,14 @@ CREATE TABLE Cities (
 
 -- Table: Countries
 CREATE TABLE Countries (
-    CountryID int  NOT NULL,
+    CountryID int  NOT NULL IDENTITY(1,1),
     CountryName varchar(40)  NOT NULL,
     CONSTRAINT Countries_pk PRIMARY KEY  (CountryID)
 );
 
 -- Table: CourseModules
 CREATE TABLE CourseModules (
-    ModuleID int  NOT NULL,
+    ModuleID int  NOT NULL IDENTITY(1,1),
     CourseID int  NOT NULL,
     ModuleName varchar(40)  NOT NULL,
     ModuleType int  NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE CourseModulesPassed (
 
 -- Table: Courses
 CREATE TABLE Courses (
-    CourseID int  NOT NULL,
+    CourseID int  NOT NULL IDENTITY(1,1),
     CourseName varchar(40)  NOT NULL,
     CourseCoordinatorID int  NOT NULL,
     CourseDescription varchar(255)  NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE Courses (
 
 -- Table: Degrees
 CREATE TABLE Degrees (
-    DegreeID int  NOT NULL,
+    DegreeID int  NOT NULL IDENTITY(1,1),
     DegreeName varchar(40)  NOT NULL,
     CONSTRAINT Degrees_pk PRIMARY KEY  (DegreeID)
 );
@@ -72,21 +72,21 @@ CREATE TABLE Employees (
 
 -- Table: FormOfActivity
 CREATE TABLE FormOfActivity (
-    ActivityTypeID int  NOT NULL,
+    ActivityTypeID int  NOT NULL IDENTITY(1,1),
     TypeName varchar(40)  NOT NULL,
     CONSTRAINT FormOfActivity_pk PRIMARY KEY  (ActivityTypeID)
 );
 
 -- Table: Grades
 CREATE TABLE Grades (
-    GradeID int  NOT NULL,
+    GradeID int  NOT NULL IDENTITY(1,1),
     GradeName varchar(40)  NOT NULL,
     CONSTRAINT Grades_pk PRIMARY KEY  (GradeID)
 );
 
 -- Table: Internship
 CREATE TABLE Internship (
-    InternshipID int  NOT NULL,
+    InternshipID int  NOT NULL IDENTITY(1,1),
     StudiesID int  NOT NULL,
     InternshipCoordinatorID int  NOT NULL,
     StartDate date  NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE InternshipPassed (
 
 -- Table: Languages
 CREATE TABLE Languages (
-    LanguageID int  NOT NULL,
+    LanguageID int  NOT NULL IDENTITY(1,1),
     LanguageName varchar(40)  NOT NULL,
     CONSTRAINT Languages_pk PRIMARY KEY  (LanguageID)
 );
@@ -132,7 +132,7 @@ CREATE TABLE OnlineMeetings (
 
 -- Table: OrderDetails
 CREATE TABLE OrderDetails (
-    DetailID int  NOT NULL,
+    DetailID int  NOT NULL IDENTITY(1,1),
     OrderID int  NOT NULL,
     ActivityID int  NOT NULL,
     TypeOfActivity int  NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE OrderDetails (
 
 -- Table: Orders
 CREATE TABLE Orders (
-    OrderID int  NOT NULL,
+    OrderID int  NOT NULL IDENTITY(1,1),
     StudentID int  NOT NULL,
     OrderDate datetime  NOT NULL,
     PaymentDeferred bit  NOT NULL,
@@ -164,14 +164,14 @@ CREATE TABLE PaymentsAdvances (
 
 -- Table: Roles
 CREATE TABLE Roles (
-    RoleID int  NOT NULL,
+    RoleID int  NOT NULL IDENTITY(1,1),
     RoleName varchar(40)  NOT NULL,
     CONSTRAINT Roles_pk PRIMARY KEY  (RoleID)
 );
 
 -- Table: Rooms
 CREATE TABLE Rooms (
-    RoomID int  NOT NULL,
+    RoomID int  NOT NULL IDENTITY(1,1),
     RoomName varchar(40)  NOT NULL,
     Street varchar(40)  NOT NULL,
     PostalCode varchar(6)  NOT NULL,
@@ -200,7 +200,7 @@ CREATE TABLE StationaryMeetings (
 
 -- Table: Studies
 CREATE TABLE Studies (
-    StudiesID int  NOT NULL,
+    StudiesID int  NOT NULL IDENTITY(1,1),
     StudiesCoordinatorID int  NOT NULL,
     StudyName varchar(40)  NOT NULL,
     StudyPrice money  NOT NULL,
@@ -238,7 +238,7 @@ CREATE TABLE StudyMeetingPresence (
 
 -- Table: StudyMeetings
 CREATE TABLE StudyMeetings (
-    MeetingID int  NOT NULL,
+    MeetingID int  NOT NULL IDENTITY(1,1),
     SubjectID int  NOT NULL,
     LecturerID int  NOT NULL,
     MeetingType int  NOT NULL,
@@ -253,7 +253,7 @@ CREATE TABLE StudyMeetings (
 
 -- Table: Subjects
 CREATE TABLE Subjects (
-    SubjectID int  NOT NULL,
+    SubjectID int  NOT NULL IDENTITY(1,1),
     StudiesID int  NOT NULL,
     TeacherID int  NOT NULL,
     SubjectName varchar(40)  NOT NULL,
@@ -280,7 +280,7 @@ CREATE TABLE TranslatedLanguage (
 
 -- Table: Users
 CREATE TABLE Users (
-    UserID int  NOT NULL,
+    UserID int  NOT NULL IDENTITY(1,1),
     FirstName varchar(40)  NOT NULL,
     LastName varchar(40)  NOT NULL,
     Street varchar(40)  NOT NULL,
@@ -301,7 +301,7 @@ CREATE TABLE UsersRoles (
 
 -- Table: Webinars
 CREATE TABLE Webinars (
-    WebinarID int  NOT NULL,
+    WebinarID int  NOT NULL IDENTITY(1,1),
     WebinarName varchar(40)  NOT NULL,
     WebinarDescription varchar(255)  NOT NULL,
     TeacherID int  NOT NULL,
