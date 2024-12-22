@@ -41,7 +41,7 @@ CREATE TABLE CourseModulesPassed (
     ModuleID int  NOT NULL,
     StudentID int  NOT NULL,
     Passed bit  NOT NULL,
-    CONSTRAINT StudyMeetingPresence_pk PRIMARY KEY  (ModuleID,StudentID)
+    CONSTRAINT CourseModulesPassed_pk PRIMARY KEY  (ModuleID,StudentID)
 );
 
 -- Table: Courses
