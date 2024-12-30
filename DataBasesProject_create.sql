@@ -117,15 +117,15 @@ CREATE TABLE OnlineCourseMeeting (
     ModuleID int  NOT NULL,
     StartDate datetime  NOT NULL,
     EndDate datetime  NOT NULL,
-    MeetingLink int  NULL,
-    VideoLink int  NULL,
+    MeetingLink varchar(255)  NULL,
+    VideoLink varchar(255)  NULL,
     CONSTRAINT OnlineCourseMeeting_pk PRIMARY KEY  (MeetingID)
 );
 
 -- Table: OnlineMeetings
 CREATE TABLE OnlineMeetings (
     MeetingID int  NOT NULL,
-    MeetingLink int  NULL,
+    MeetingLink varchar(255)  NULL,
     StudentLimit int  NOT NULL,
     CONSTRAINT OnlineMeetings_pk PRIMARY KEY  (MeetingID)
 );
