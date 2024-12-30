@@ -1768,7 +1768,7 @@
                 </Column>
                 <Column Id="c154">
                     <Name>MeetingLink</Name>
-                    <Type>int</Type>
+                    <Type>varchar</Type>
                     <Description></Description>
                     <Nullable>true</Nullable>
                     <DefaultValue></DefaultValue>
@@ -1777,7 +1777,7 @@
                 </Column>
                 <Column Id="c155">
                     <Name>VideoLink</Name>
-                    <Type>int</Type>
+                    <Type>varchar</Type>
                     <Description></Description>
                     <Nullable>true</Nullable>
                     <DefaultValue></DefaultValue>
@@ -1913,7 +1913,7 @@
                 </Column>
                 <Column Id="c180">
                     <Name>MeetingLink</Name>
-                    <Type>int</Type>
+                    <Type>varchar</Type>
                     <Description></Description>
                     <Nullable>true</Nullable>
                     <DefaultValue></DefaultValue>
@@ -3512,8 +3512,8 @@
         <TableDisplay Id="td34">
             <X>7910.5</X>
             <Y>7110.5</Y>
-            <Width>184.0</Width>
-            <Height>100.0</Height>
+            <Width>185.0</Width>
+            <Height>116.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
             <Table>t34</Table>
