@@ -1,0 +1,60 @@
+CityID,CityName,CountryID
+1,Warszawa,1
+2,Kraków,1
+3,Wrocław,1
+4,Poznań,1
+5,Gdańsk,1
+6,Szczecin,1
+7,Łódź,1
+8,Lublin,1
+9,Katowice,1
+10,Białystok,1
+11,Toruń,1
+12,Bydgoszcz,1
+13,Gdynia,1
+14,Częstochowa,1
+15,Kielce,1
+16,Zielona Góra,1
+17,Opole,1
+18,Olsztyn,1
+19,Rzeszów,1
+20,Sopot,1
+21,Berlin,2
+22,Monachium,2
+23,Hamburg,2
+24,Paryż,3
+25,Marsylia,3
+26,Rzym,4
+27,Mediolan,4
+28,Neapol,4
+29,Madryt,5
+30,Barcelona,5
+31,Lizbona,6
+32,Porto,6
+33,Londyn,7
+34,Manchester,7
+35,Nowy Jork,8
+36,Los Angeles,8
+37,Ottawa,9
+38,Toronto,9
+39,Meksyk (miasto),10
+40,Guadalajara,10
+41,Brazylia (miasto),11
+42,São Paulo,11
+43,Buenos Aires,12
+44,Kordoba,12
+45,Sydney,13
+46,Melbourne,13
+47,Pekin,14
+48,Szanghaj,14
+49,Tokio,15
+50,Kioto,15
+51,Delhi,16
+52,Mumbaj,16
+53,Moskwa,17
+54,Sankt Petersburg,17
+55,Kair,18
+56,Alexandria,18
+57,Kapsztad,19
+58,Johannesburg,19
+59,Stambuł,20
