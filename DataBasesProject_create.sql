@@ -13,6 +13,7 @@ CREATE TABLE ActivitiesTypes (
 CREATE TABLE Cities (
     CityID int  NOT NULL IDENTITY(1,1),
     CityName varchar(40)  NOT NULL,
+    PostalCode varchar(6)  NOT NULL,
     CountryID int  NOT NULL,
     CONSTRAINT Cities_pk PRIMARY KEY  (CityID)
 );
@@ -59,6 +60,7 @@ CREATE TABLE Courses (
 CREATE TABLE Degrees (
     DegreeID int  NOT NULL IDENTITY(1,1),
     DegreeName varchar(40)  NOT NULL,
+    DegreeShort varchar(20)  NOT NULL,
     CONSTRAINT Degrees_pk PRIMARY KEY  (DegreeID)
 );
 
@@ -174,7 +176,6 @@ CREATE TABLE Rooms (
     RoomID int  NOT NULL IDENTITY(1,1),
     RoomName varchar(40)  NOT NULL,
     Street varchar(40)  NOT NULL,
-    PostalCode varchar(6)  NOT NULL,
     CityID int  NOT NULL,
     Limit int  NOT NULL,
     CONSTRAINT Rooms_pk PRIMARY KEY  (RoomID)
@@ -284,7 +285,6 @@ CREATE TABLE Users (
     FirstName varchar(40)  NOT NULL,
     LastName varchar(40)  NOT NULL,
     Street varchar(40)  NOT NULL,
-    PostalCode varchar(6)  NOT NULL,
     CityID int  NOT NULL,
     Email varchar(40)  NOT NULL,
     Phone varchar(40)  NOT NULL,
