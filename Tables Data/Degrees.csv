@@ -1,9 +1,9 @@
-DegreeID,DegreeName
-1,Licencjat
-2,Inżynier
-3,Magister
-4,Magister inżynier
-5,Doktor
-6,Doktor inżynier
-7,Doktor habilitowany
-8,Profesor doktor habilitowany
+DegreeID,DegreeName,DegreeShort
+1,Licencjat, lic.
+2,Inżynier, inż.
+3,Magister, mgr.
+4,Magister inżynier, mgr. inż
+5,Doktor, dr
+6,Doktor inżynier, dr inż.
+7,Doktor habilitowany, dr hab.
+8,Profesor doktor habilitowany, prof. dr hab.
