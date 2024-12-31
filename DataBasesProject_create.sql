@@ -82,6 +82,7 @@ CREATE TABLE FormOfActivity (
 -- Table: Grades
 CREATE TABLE Grades (
     GradeID int  NOT NULL IDENTITY(1,1),
+    GradeNumber varchar(3)  NOT NULL,
     GradeName varchar(40)  NOT NULL,
     CONSTRAINT Grades_pk PRIMARY KEY  (GradeID)
 );

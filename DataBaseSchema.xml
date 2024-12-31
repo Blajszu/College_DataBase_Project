@@ -19,7 +19,7 @@
         </Counter>
         <Counter>
             <Name>column</Name>
-            <Value>210</Value>
+            <Value>211</Value>
             <Prefix>c</Prefix>
         </Counter>
         <Counter>
@@ -1237,6 +1237,15 @@
                 <Column Id="c39">
                     <Name>GradeID</Name>
                     <Type>int</Type>
+                    <Description></Description>
+                    <Nullable>false</Nullable>
+                    <DefaultValue></DefaultValue>
+                    <CheckExpression></CheckExpression>
+                    <Properties/>
+                </Column>
+                <Column Id="c211">
+                    <Name>GradeNumber</Name>
+                    <Type>varchar</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -3411,9 +3420,9 @@
         </TableDisplay>
         <TableDisplay Id="td11">
             <X>7049.5</X>
-            <Y>6356.5</Y>
-            <Width>152.0</Width>
-            <Height>57.0</Height>
+            <Y>6349.5</Y>
+            <Width>167.0</Width>
+            <Height>73.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
             <Table>t11</Table>
@@ -4007,11 +4016,11 @@
             <ControlPoints>
                 <ControlPoint>
                     <X>7175.5</X>
-                    <Y>6403.5</Y>
+                    <Y>6396.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>7072.5</X>
-                    <Y>6403.5</Y>
+                    <Y>6396.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>7072.5</X>
@@ -4032,7 +4041,7 @@
             <ControlPoints>
                 <ControlPoint>
                     <X>7073.5</X>
-                    <Y>6366.5</Y>
+                    <Y>6359.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>7073.5</X>
