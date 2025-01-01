@@ -1,5 +1,7 @@
-import csv
+import csv, os
 from datetime import datetime, timedelta
+
+os.chdir(os.path.dirname(__file__))
 
 webinars_csv = '../Tables Data/Webinars.csv'
 user_roles_csv = '../Tables Data/UserRoles.csv'
