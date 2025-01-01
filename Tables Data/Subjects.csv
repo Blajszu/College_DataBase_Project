@@ -1,0 +1,263 @@
+SubjectID,StudiesID,TeacherID,SubjectName,SubjectDescription,NumberOfHoursInTerm,Term
+1,1,1025,Matematyka dyskretna,"Podstawy matematyki dyskretnej, logika, teoria zbiorów",21,1
+2,1,133,Podstawy programowania,Wprowadzenie do programowania w języku C++,7,1
+3,1,654,Algebra liniowa,"Macierze, przekształcenia liniowe, układy równań",7,1
+4,1,279,Fizyka,Podstawy fizyki dla informatyków,14,1
+5,1,1053,Logika,Podstawy logiki matematycznej,21,1
+6,1,1025,Architektura komputerów,Budowa i działanie systemów komputerowych,7,2
+7,1,133,Programowanie obiektowe,"Programowanie w języku Java, dziedziczenie, polimorfizm",14,2
+8,1,654,Analiza matematyczna,Rachunek różniczkowy i całkowy,14,2
+9,1,235,Systemy operacyjne,Architektura i administracja systemami operacyjnymi,21,2
+10,1,1053,Sieci komputerowe,Podstawy działania sieci komputerowych,14,2
+11,1,1025,Bazy danych,Projektowanie i implementacja baz danych SQL,14,3
+12,1,133,Inżynieria oprogramowania,Metodyki wytwarzania oprogramowania,7,3
+13,1,654,Algorytmy i struktury danych,Zaawansowane struktury danych i algorytmy,21,3
+14,1,279,Programowanie aplikacji webowych,Tworzenie aplikacji internetowych,14,3
+15,1,1053,Języki i paradygmaty programowania,Przegląd różnych paradygmatów programowania,14,3
+16,1,1025,Sztuczna inteligencja,Podstawy AI i uczenia maszynowego,7,4
+17,1,133,Grafika komputerowa,Podstawy grafiki 2D i 3D,21,4
+18,1,654,Systemy wbudowane,Programowanie systemów wbudowanych,21,4
+19,1,279,Bezpieczeństwo systemów,Podstawy cyberbezpieczeństwa,14,4
+20,1,1053,Projektowanie interfejsów użytkownika,UX/UI design,7,4
+21,1,1054,Zaawansowane bazy danych,"Nierelacyjne bazy danych, big data",21,5
+22,1,284,Cloud computing,Przetwarzanie w chmurze,14,5
+23,1,944,Zarządzanie projektami IT,Metodyki zarządzania projektami,7,5
+24,1,694,Programowanie współbieżne,Wielowątkowość i współbieżność,21,5
+25,1,698,Testowanie oprogramowania,Metody i narzędzia testowania,7,5
+26,1,1054,Wzorce projektowe,Projektowanie i implementacja wzorców,14,6
+27,1,300,DevOps,Praktyki DevOps i ciągła integracja,14,6
+28,1,944,Seminarium dyplomowe,Przygotowanie pracy inżynierskiej,14,6
+29,1,1054,Projekt zespołowy,Realizacja projektu w zespole,70,7
+30,2,1054,Podstawy cyberbezpieczeństwa,Wprowadzenie do bezpieczeństwa systemów,7,1
+31,2,300,Matematyka dyskretna,Podstawy matematyki dla cyberbezpieczeństwa,14,1
+32,2,944,Podstawy programowania,Programowanie w języku Python,7,1
+33,2,694,Systemy operacyjne,Bezpieczeństwo systemów operacyjnych,21,1
+34,2,698,Kryptografia,Podstawy kryptografii,21,1
+35,2,300,Sieci komputerowe,Architektura i protokoły sieciowe,7,2
+36,2,944,Bezpieczeństwo sieci,Zabezpieczanie infrastruktury sieciowej,7,2
+37,2,694,Analiza malware,Analiza złośliwego oprogramowania,14,2
+38,2,698,Programowanie bezpiecznych aplikacji,Secure coding practices,14,2
+39,2,832,Prawo w cyberbezpieczeństwie,Aspekty prawne cyberbezpieczeństwa,28,2
+40,2,694,Ethical hacking,Testy penetracyjne,7,3
+41,2,698,Forensyka cyfrowa,Analiza śledcza systemów,14,3
+42,2,832,Bezpieczeństwo aplikacji webowych,Zabezpieczanie aplikacji internetowych,14,3
+43,2,713,Zarządzanie incydentami,Reagowanie na incydenty bezpieczeństwa,21,3
+44,2,76,Kryptografia stosowana,Zaawansowane metody szyfrowania,14,3
+45,2,832,Bezpieczeństwo chmury,Cloud security,21,4
+46,2,713,Ochrona danych osobowych,GDPR i prywatność danych,21,4
+47,2,458,Bezpieczeństwo IoT,Zabezpieczanie urządzeń IoT,14,4
+48,2,190,Systemy IDS/IPS,Systemy wykrywania włamań,7,4
+49,2,502,Zarządzanie ryzykiem,Analiza i zarządzanie ryzykiem,7,4
+50,2,832,Security Operations Center,Zarządzanie SOC,28,5
+51,2,713,Threat Intelligence,Analiza zagrożeń,14,5
+52,2,458,Bezpieczeństwo przemysłowe,Cyberbezpieczeństwo systemów OT,7,5
+53,2,461,Mobile Security,Bezpieczeństwo urządzeń mobilnych,14,5
+54,2,854,Audyt bezpieczeństwa,Metodyki audytu bezpieczeństwa,7,5
+55,2,713,Red Team Operations,Zaawansowane testy penetracyjne,28,6
+56,2,458,Blue Team Operations,Obrona infrastruktury IT,7,6
+57,2,461,Seminarium dyplomowe,Przygotowanie pracy inżynierskiej,21,6
+58,2,461,Projekt zespołowy,Projekt z zakresu cyberbezpieczeństwa,70,7
+59,3,854,Mikroekonomia,"Podstawy ekonomii, analiza rynku",21,1
+60,3,348,Matematyka,Matematyka w ekonomii,14,1
+61,3,860,Wprowadzenie do zarządzania,Teoria organizacji i zarządzania,21,1
+62,3,97,Prawo gospodarcze,Podstawy prawa gospodarczego,7,1
+63,3,740,Business English,Profesjonalna komunikacja biznesowa,7,1
+64,3,854,Makroekonomia,Gospodarka w skali makro,21,2
+65,3,348,Statystyka,Metody statystyczne w ekonomii,7,2
+66,3,860,Rachunkowość,Podstawy rachunkowości,14,2
+67,3,97,Marketing,Podstawy marketingu,14,2
+68,3,740,Econometrics,Econometric models,14,2
+69,3,348,Corporate finance,Financial management,14,3
+70,3,860,Financial analysis,Financial analysis methods,7,3
+71,3,97,Financial markets,Functioning of financial markets,14,3
+72,3,740,Project management,Project management,21,3
+73,3,485,Business intelligence,Business data analysis,14,3
+74,3,348,International trade,International economic relations,7,4
+75,3,860,Tax systems,Taxes in business,14,4
+76,3,97,Human resource management,HR management,14,4
+77,3,740,E-commerce,Electronic commerce,28,4
+78,3,485,Labor law,Legal aspects of employment,7,4
+79,3,485,Controlling,Financial and operational controlling,21,5
+80,3,613,Enterprise strategies,Strategic management,7,5
+81,3,103,Innovation in business,Innovation management,14,5
+82,3,233,Business negotiations,Negotiation techniques,14,5
+83,3,374,Ethics in business,Ethics and CSR,14,5
+84,3,485,Undergraduate seminar,Undergraduate thesis preparation,14,6
+85,3,613,Apprenticeship,Apprenticeship in business,14,6
+86,3,103,Business plan,Preparation of business plan,21,6
+87,3,454,Entrepreneurship,Starting and running a business,14,6
+88,3,495,Team project,Business project,7,6
+89,4,613,Analiza matematyczna I,"Funkcje jednej zmiennej, granice, pochodne",14,1
+90,4,103,Algebra liniowa,"Przestrzenie wektorowe, macierze",7,1
+91,4,619,Logika matematyczna,Rachunek zdań i kwantyfikatorów,28,1
+92,4,495,Wstęp do matematyki,Podstawy teorii mnogości,14,1
+93,4,630,Geometria analityczna,Geometria w układzie współrzędnych,7,1
+94,4,613,Analiza matematyczna II,Całki oznaczone i nieoznaczone,21,2
+95,4,103,Algebra abstrakcyjna,"Grupy, pierścienie, ciała",14,2
+96,4,619,Matematyka dyskretna,Kombinatoryka i teoria grafów,14,2
+97,4,495,Równania różniczkowe,Równania różniczkowe zwyczajne,7,2
+98,4,881,Topologia,Podstawy topologii,14,2
+99,4,881,Teoria miary,Miara i całka Lebesgue'a,7,3
+100,4,908,Rachunek prawdopodobieństwa,Podstawy teorii prawdopodobieństwa,21,3
+101,4,625,Geometria różniczkowa,Krzywe i powierzchnie,7,3
+102,4,619,Analiza funkcjonalna,Przestrzenie Banacha i Hilberta,14,3
+103,4,619,Teoria liczb,Podstawy teorii liczb,21,3
+104,4,881,Statystyka matematyczna,Wnioskowanie statystyczne,7,4
+105,4,1009,Analiza zespolona,Funkcje zmiennej zespolonej,28,4
+106,4,625,Teoria mnogości,Zaawansowana teoria mnogości,14,4
+107,4,300,Metody numeryczne,Algorytmy numeryczne,14,4
+108,4,335,Historia matematyki,Rozwój myśli matematycznej,7,4
+109,4,1009,Teoria optymalizacji,Metody optymalizacji,14,5
+110,4,625,Teoria chaosu,Układy dynamiczne,21,5
+111,4,881,Modelowanie matematyczne,Zastosowania matematyki,7,5
+112,4,495,Teoria gier,Podstawy teorii gier,14,5
+113,4,279,Matematyka finansowa,Matematyka w finansach,14,5
+114,4,1009,Seminarium licencjackie,Przygotowanie pracy licencjackiej,28,6
+115,4,625,Projekt badawczy,Realizacja projektu matematycznego,7,6
+116,4,854,Dydaktyka matematyki,Metody nauczania matematyki,7,6
+117,4,1009,Zastosowania matematyki,Matematyka w praktyce,21,6
+118,5,256,Podstawy programowania,Algorytmika i programowanie w C++,28,1
+119,5,257,Matematyka dla informatyków,Elementy matematyki wyższej,7,1
+120,5,273,Podstawy elektroniki,Elementy i układy elektroniczne,14,1
+121,5,958,Architektura komputerów,Organizacja systemów komputerowych,14,1
+122,5,790,Fizyka techniczna,Podstawy fizyki dla informatyków,7,1
+123,5,256,Programowanie obiektowe,Java i paradygmat obiektowy,14,2
+124,5,257,Systemy operacyjne,Budowa i działanie systemów operacyjnych,7,2
+125,5,273,Sieci komputerowe,Protokoły i architektury sieciowe,21,2
+126,5,20,Bazy danych,Projektowanie i implementacja baz danych,7,2
+127,5,790,Metody numeryczne,Obliczenia numeryczne,21,2
+128,5,256,Inżynieria oprogramowania,Proces wytwarzania oprogramowania,21,3
+129,5,257,Programowanie aplikacji mobilnych,Rozwój aplikacji na Android/iOS,7,3
+130,5,273,Sztuczna inteligencja,Podstawy AI i machine learning,14,3
+131,5,20,Systemy wbudowane,Programowanie mikrokontrolerów,7,3
+132,5,790,Bezpieczeństwo systemów,Podstawy cyberbezpieczeństwa,21,3
+133,5,256,Grafika komputerowa,Algorytmy grafiki 2D i 3D,14,4
+134,5,257,Przetwarzanie obrazów,Analiza i obróbka obrazów,21,4
+135,5,273,Internet rzeczy,Technologie IoT,21,4
+136,5,20,Big Data,Przetwarzanie dużych zbiorów danych,7,4
+137,5,790,Chmury obliczeniowe,Usługi i platformy chmurowe,7,4
+138,5,673,Programowanie równoległe,Obliczenia równoległe i rozproszone,14,5
+139,5,932,Data Mining,Eksploracja danych,21,5
+140,5,167,DevOps,Praktyki DevOps,7,5
+141,5,1072,Wizualizacja danych,Techniki wizualizacji informacji,7,5
+142,5,692,Zarządzanie projektami IT,Metodyki prowadzenia projektów,21,5
+143,5,673,Seminarium inżynierskie,Przygotowanie pracy inżynierskiej,28,6
+144,5,932,Projekt zespołowy,Realizacja projektu informatycznego,14,6
+145,5,167,Systemy czasu rzeczywiste,Programowanie systemów RT,14,6
+146,5,673,Zaawansowane programowanie,Wybrane zagadnienia programowania,70,7
+147,6,673,Podstawy automatyki,Teoria sterowania,7,1
+148,6,932,Matematyka I,Algebra i analiza matematyczna,21,1
+149,6,167,Fizyka techniczna,Mechanika i elektryczność,14,1
+150,6,1072,Podstawy elektroniki,Elementy i układy elektroniczne,7,1
+151,6,692,Wprowadzenie do robotyki,Historia i podstawy robotyki,21,1
+152,6,932,Mechanika techniczna,Statyka i kinematyka,7,2
+153,6,167,Matematyka II,Równania różniczkowe,28,2
+154,6,1072,Programowanie robotów,Podstawy programowania robotów,7,2
+155,6,692,Teoria obwodów,Analiza obwodów elektrycznych,14,2
+156,6,437,Metrologia,Pomiary wielkości fizycznych,14,2
+157,6,1072,Napędy elektryczne,Silniki i układy napędowe,21,3
+158,6,692,Sterowniki PLC,Programowanie sterowników logicznych,14,3
+159,6,437,Systemy czasu rzeczywiste,Programowanie systemów RT,7,3
+160,6,825,Czujniki i aktuatory,Elementy wykonawcze automatyki,14,3
+161,6,5,CAD/CAM,Projektowanie wspomagane komputerowo,14,3
+162,6,437,Robotyka przemysłowa,Roboty przemysłowe,21,4
+163,6,825,Systemy SCADA,Wizualizacja procesów przemysłowych,14,4
+164,6,442,Dynamika robotów,Analiza dynamiczna manipulatorów,14,4
+165,6,953,Automatyka budynkowa,Inteligentne systemy budynkowe,7,4
+166,6,316,Wizyjne systemy robotów,Systemy wizyjne w robotyce,14,4
+167,6,437,Sztuczna inteligencja,AI w automatyce i robotyce,21,5
+168,6,825,Manipulatory przemysłowe,Projektowanie manipulatorów,14,5
+169,6,442,Internet rzeczy,IoT w automatyce przemysłowej,21,5
+170,6,953,Systemy wbudowane,Programowanie mikrokontrolerów,7,5
+171,6,316,Bezpieczeństwo przemysłowe,Normy i standardy bezpieczeństwa,7,5
+172,6,825,Projekt inżynierski,Przygotowanie projektu końcowego,7,6
+173,6,442,Seminarium dyplomowe,Przygotowanie pracy inżynierskiej,21,6
+174,6,953,Robotyka mobilna,Roboty mobilne i autonomiczne,21,6
+175,6,953,Systemy sterowania,Zaawansowane systemy sterowania,70,7
+176,7,316,Mechanika klasyczna,Kinematyka i dynamika,14,1
+177,7,74,Matematyka I,Analiza matematyczna,7,1
+178,7,208,Wstęp do fizyki,Historia i metodologia fizyki,7,1
+179,7,342,Algebra liniowa,Wektory i macierze,21,1
+180,7,984,Podstawy programowania,Programowanie w Pythonie,21,1
+181,7,316,Elektrodynamika,Teoria pola elektromagnetycznego,7,2
+182,7,74,Matematyka II,Równania różniczkowe,14,2
+183,7,208,Termodynamika,Zasady termodynamiki,7,2
+184,7,342,Metody numeryczne,Obliczenia w fizyce,14,2
+185,7,984,Elektronika,Podstawy elektroniki,28,2
+186,7,1096,Mechanika kwantowa,Podstawy mechaniki kwantowej,21,3
+187,7,208,Optyka,Optyka geometryczna i falowa,21,3
+188,7,342,Fizyka statystyczna,Mechanika statystyczna,7,3
+189,7,984,Fizyka atomowa,Budowa atomu,7,3
+190,7,857,Laboratorium fizyczne I,Eksperymenty fizyczne,14,3
+191,7,74,Fizyka jądrowa,Fizyka jądra atomowego,14,4
+192,7,208,Fizyka ciała stałego,Właściwości materii skondensowanej,14,4
+193,7,342,Astronomia,Podstawy astronomii,14,4
+194,7,984,Teoria względności,Szczególna teoria względności,14,4
+195,7,857,Laboratorium fizyczne II,Zaawansowane eksperymenty,14,4
+196,7,857,Fizyka cząstek,Fizyka cząstek elementarnych,21,5
+197,7,729,Astrofizyka,Procesy astrofizyczne,21,5
+198,7,734,Modelowanie komputerowe,Symulacje zjawisk fizycznych,7,5
+199,7,353,Seminarium licencjackie,Przygotowanie pracy licencjackiej,14,5
+200,7,857,Projekt badawczy,Realizacja projektu fizycznego,28,6
+201,7,729,Historia fizyki,Rozwój myśli fizycznej,14,6
+202,7,734,Zastosowania fizyki,Fizyka w praktyce,7,6
+203,7,353,Dydaktyka fizyki,Metody nauczania fizyki,7,6
+204,7,228,Fizyka współczesna,Najnowsze odkrycia w fizyce,14,6
+205,8,182,Podstawy logistyki,Wprowadzenie do logistyki,14,1
+206,8,28,Matematyka,Matematyka w logistyce,14,1
+207,8,661,Ekonomia,Podstawy ekonomii,21,1
+208,8,835,Transport,Systemy transportowe,14,1
+209,8,527,Prawo transportowe,Regulacje prawne w transporcie,7,1
+210,8,263,Zarządzanie łańcuchem dostaw,Supply chain management,14,2
+211,8,989,Spedycja,Organizacja spedycji,21,2
+212,8,960,Magazynowanie,Gospodarka magazynowa,21,2
+213,8,661,Systemy informatyczne,IT w logistyce,7,2
+214,8,398,Statystyka,Metody statystyczne,7,2
+215,8,182,Logistyka produkcji,Zarządzanie produkcją,7,3
+216,8,405,E-commerce,Logistyka w handlu elektronicznym,14,3
+217,8,28,Zarządzanie jakością,Systemy zarządzania jakością,14,3
+218,8,247,Logistyka międzynarodowa,Transport międzynarodowy,21,3
+219,8,412,Projektowanie procesów,Optymalizacja procesów,14,3
+220,8,527,Automatyzacja magazynów,Systemy automatyki magazynowej,14,4
+221,8,473,Logistyka miejska,Transport w aglomeracjach,14,4
+222,8,405,Centra logistyczne,Projektowanie centrów logistycznych,21,4
+223,8,661,Analiza kosztów,Controlling logistyczny,14,4
+224,8,263,Symulacje procesów,Modelowanie procesów,7,4
+225,8,398,Logistyka zwrotna,Reverse logistics,7,5
+226,8,28,Transport intermodalny,Systemy transportu intermodalnego,14,5
+227,8,247,Zarządzanie flotą,Fleet management,21,5
+228,8,989,Logistyka 4,Cyfryzacja w logistyce,14,5
+229,8,835,Projekt logistyczny,Projektowanie systemów,14,5
+230,8,527,Seminarium inżynierskie,Przygotowanie pracy inżynierskiej,14,6
+231,8,182,Informatyka w logistyce,Systemy wspomagania decyzji,21,6
+232,8,263,Zarządzanie projektami,Project management,14,6
+233,8,247,Business English,Język angielski w logistyce,70,7
+234,9,50,Teoria obwodów I,Podstawy teorii obwodów,21,1
+235,9,3,Matematyka I,Analiza matematyczna,21,1
+236,9,3,Fizyka,Fizyka dla elektroników,7,1
+237,9,425,Podstawy elektroniki,Elementy elektroniczne,14,1
+238,9,507,Rysunek techniczny,CAD w elektronice,7,1
+239,9,50,Teoria obwodów II,Zaawansowana teoria obwodów,14,2
+240,9,3,Matematyka II,Równania różniczkowe,14,2
+241,9,821,Układy cyfrowe,Technika cyfrowa,21,2
+242,9,837,Metrologia,Pomiary elektroniczne,7,2
+243,9,507,Programowanie,Podstawy programowania,14,2
+244,9,534,Elektronika analogowa,Układy analogowe,14,3
+245,9,1086,Mikroprocesory,Systemy mikroprocesorowe,21,3
+246,9,849,Technika mikrofalowa,Układy mikrofalowe,7,3
+247,9,786,Systemy wbudowane,Programowanie mikrokontrolerów,7,3
+248,9,425,Elektromagnetyzm,Pole elektromagnetyczne,21,3
+249,9,821,Elektronika cyfrowa,Układy programowalne,14,4
+250,9,837,Optoelektronika,Elementy optoelektroniczne,14,4
+251,9,849,Energoelektronika,Przekształtniki,14,4
+252,9,786,Systemy telekomunikacyjne,Podstawy telekomunikacji,14,4
+253,9,50,Techniki wysokich częstotliwości,RF design,14,4
+254,9,507,Elektronika przemysłowa,Aplikacje przemysłowe,21,5
+255,9,534,Sensory i przetworniki,Czujniki elektroniczne,7,5
+256,9,1086,Niezawodność układów,Testowanie układów,7,5
+257,9,878,IoT,Internet rzeczy,14,5
+258,9,425,Projekt elektroniczny,Projektowanie układów,21,5
+259,9,821,Seminarium inżynierskie,Przygotowanie pracy inżynierskiej,35,6
+260,9,837,Systemy pomiarowe,Zaawansowane systemy pomiarowe,14,6
+261,9,534,EMC,Kompatybilność elektromagnetyczna,14,6
+262,9,786,Elektronika samochodowa,Układy elektroniczne w pojazdach,70,7
