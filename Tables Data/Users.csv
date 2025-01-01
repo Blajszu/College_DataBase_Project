@@ -706,7 +706,7 @@ UserID,FirstName,LastName,Street,CityID,Email,Phone,DateOfBirth
 705,Malwina,Ostrowski,Radosna 22,4,malwina.ostrowski@example.com,942022906,1981-02-27
 706,Iga,Tokarski,Stara 99,2,iga.tokarski@example.com,866396141,1988-03-24
 707,Marta,Wesołowski,Szmaragdowa 99,1,marta.wesolowski@example.com,896003156,1987-01-15
-708,Malwina,Makowski,Róży Luksemburg 85,8,malwina.makowski@example.com,939141971,1975-08-02
+708,Malwina,Makowski,Róży Luksemburg 85,5,malwina.makowski@example.com,939141971,1975-08-02
 709,Barbara,Michalski,Gwiezdna 29,4,barbara.michalski@example.com,716566126,2004-07-11
 710,Leon,Bąk,Antoniego Malczewskiego 68,1,leon.bak@example.com,723872085,1985-10-11
 711,Filip,Wojciechowski,Olchowa 81,1,filip.wojciechowski@example.com,662230416,1992-11-16
