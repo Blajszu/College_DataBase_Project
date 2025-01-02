@@ -1,0 +1,10 @@
+StudiesID,StudiesCoordinatorID,StudyName,StudyPrice,StudyDescription,NumberOfTerms,StudentLimit
+1,410,Informatyka,500,"Studia inżynierskie 1 stopnia, niestacjonarne",7,40
+2,478,Informatyka i cyberbezpieczeństwo,700,"Studia inżynierskie 1 stopnia, niestacjonarne",7,20
+3,744,Economy,400,"Dachelor degree, part-time studies",6,30
+4,498,Matematyka,200,"Studia licencjackie 1 stopnia, niestacjonarne",6,30
+5,262,Informatyka stosowana,400,"Studia inżynierskie 1 stopnia, niestacjonarne",7,30
+6,635,Automatyka i robotyka,300,"Studia inżynierskie 1 stopnia, niestacjonarne",7,30
+7,1090,Fizyka,250,"Studia licencjackie 1 stopnia, niestacjonarne",6,25
+8,346,Logistyka,400,"Studia inżynierskie 1 stopnia, niestacjonarne",7,30
+9,914,Elektronika,350,"Studia inżynierskie 1 stopnia, niestacjonarne",7,30
