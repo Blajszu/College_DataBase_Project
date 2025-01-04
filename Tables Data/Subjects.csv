@@ -57,15 +57,15 @@ SubjectID,StudiesID,TeacherID,SubjectName,SubjectDescription,NumberOfHoursInTerm
 56,2,458,Blue Team Operations,Obrona infrastruktury IT,7,6
 57,2,461,Seminarium dyplomowe,Przygotowanie pracy inzynierskiej,21,6
 58,2,461,Projekt zespolowy,Projekt z zakresu cyberbezpieczenstwa,70,7
-59,3,854,Mikroekonomia,"Podstawy ekonomii, analiza rynku",21,1
-60,3,348,Matematyka,Matematyka w ekonomii,14,1
-61,3,860,Wprowadzenie do zarzadzania,Teoria organizacji i zarzadzania,21,1
-62,3,97,Prawo gospodarcze,Podstawy prawa gospodarczego,7,1
-63,3,740,Business English,Profesjonalna komunikacja biznesowa,7,1
-64,3,854,Makroekonomia,Gospodarka w skali makro,21,2
-65,3,348,Statystyka,Metody statystyczne w ekonomii,7,2
-66,3,860,Rachunkowosc,Podstawy rachunkowosci,14,2
-67,3,97,Marketing,Podstawy marketingu,14,2
+59,3,854,Microeconomics,"Basics of economics, market analysis",21,1
+60,3,348,Mathematics, Mathematics in economics,14,1
+61,3,860,Introduction to management,Theory of organization and management,21,1
+62,3,97,Economic law, Basics of economic law,7,1
+63,3,740,Business English,Professional business communication,7,1
+64,3,854,Macroeconomics,Economy on a macro scale,21,2
+65,3,348,Statistics,Statistical methods in economics,7,2
+66,3,860,Accounting,Basics of accounting,14,2
+67,3,97,Marketing, Basics of marketing,14,2
 68,3,740,Econometrics,Econometric models,14,2
 69,3,348,Corporate finance,Financial management,14,3
 70,3,860,Financial analysis,Financial analysis methods,7,3
