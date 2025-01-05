@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 os.chdir(os.path.dirname(__file__))
 
 courses_csv = "../Tables Data/courses_without_students_limit.csv"
-modules_csv = "../Tables Data/courses_modules.csv"
-meetings_csv = "../Tables Data/courses_meetings.csv"
+modules_csv = "../Tables Data/CourseModules.csv"
+meetings_csv = "../Tables Data/a_new_meetings.csv"
 output_csv = "../Tables Data/courses_with_price.csv"
 
 def wczytaj_liste_z_csv(plik):

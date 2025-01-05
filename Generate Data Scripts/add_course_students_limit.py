@@ -4,8 +4,8 @@ os.chdir(os.path.dirname(__file__))
 
 rooms_csv = "../Tables Data/Rooms.csv"
 courses_csv = "../Tables Data/courses_with_price.csv"
-output_csv = "../Tables Data/Courses.csv"
-course_modules_csv = "../Tables Data/courses_modules.csv"
+output_csv = "../Tables Data/Courses1.csv"
+course_modules_csv = "../Tables Data/CourseModules.csv"
 course_stationary_meetings_csv = "../Tables Data/StationaryCourseMeeting.csv"
 
 def wczytaj_liste_z_csv(plik):
@@ -45,9 +45,11 @@ for meeting in course_stationary_meetings:
     
 for course in courses:
     if min_course_room_capacity[course[0]] == 1000:
+        course.pop()
         course.append("")
     else:
-        random_limit = random.randint(18,min_course_room_capacity[course[0]])
+        random_limit = random.randint(18, min_course_room_capacity[course[0]])
+        course.pop()
         course.append(str(random_limit))
 
 with open(output_csv, mode='w', newline='', encoding='utf-8') as file:

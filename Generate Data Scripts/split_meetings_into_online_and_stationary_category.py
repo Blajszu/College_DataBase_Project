@@ -8,8 +8,8 @@ def wczystaj_liste_z_csv(plik):
         next(reader)
         return [row for row in reader]
     
-meetings_csv = "../Tables Data/courses_meetings.csv"
-modules_csv = "../Tables Data/courses_modules.csv"
+meetings_csv = "../Tables Data/a_new_meetings.csv"
+modules_csv = "../Tables Data/new_modules.csv"
 
 meetings = wczystaj_liste_z_csv(meetings_csv)
 modules = wczystaj_liste_z_csv(modules_csv)

@@ -3,10 +3,11 @@ import random, csv, os
 os.chdir(os.path.dirname(__file__))
 
 meetings_csv = "../Tables Data/StationaryCourseMeeting.csv"
-courses_csv = "../Tables Data/courses_with_price.csv"
-modules_csv = "../Tables Data/courses_modules.csv"
+courses_csv = "../Tables Data/Courses.csv"
+modules_csv = "../Tables Data/new_modules.csv"
 users = "../Tables Data/Users.csv"
 rooms = "../Tables Data/Rooms.csv"
+
 
 def wczytaj_liste_z_csv(plik):
     with open(plik, mode='r', encoding='utf-8') as file:
@@ -32,18 +33,21 @@ def make_dict_with_cities_rooms():
 
 cities_rooms = make_dict_with_cities_rooms()
 
+cnt = 0
 for meeting in meetings:
     module = modules[int(meeting[1])-1]
+    course_id = module[1]
     lecturer = users[int(module[4])-1]
     city = lecturer[4]
     if city in cities_rooms.keys():
         room = random.choice(cities_rooms[city])
     else:
-        room = random.choice(rooms)[0]
+        cnt += 1
+        print(course_id)
     meeting.insert(2, room)
 
-
-with open(meetings_csv, mode='w', newline='', encoding='utf-8') as file:
+output = 'new_stationary_meetings.csv'
+with open(output, mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(["MeetingID", "ModuleID", "RoomID", "StartDate", "EndDate"])
     for meeting in meetings:

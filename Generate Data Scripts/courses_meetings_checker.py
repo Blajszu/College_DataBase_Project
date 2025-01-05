@@ -8,9 +8,9 @@ def wczytaj_liste_z_csv(plik):
         next(reader)  # Pomijanie nagłówka
         return [row for row in reader]
 
-meetings_csv = "../Tables Data/courses_meetings.csv"
+meetings_csv = "../Tables Data/a_new_meetings.csv"
 courses_csv = "../Tables Data/courses_without_students_limit.csv"
-modules_csv = "../Tables Data/courses_modules.csv"
+modules_csv = "../Tables Data/new_modules.csv"
 employees_csv = "../Tables Data/Employees.csv"
 webinars_csv = "../Tables Data/Webinars.csv"
 
@@ -172,7 +172,7 @@ def check_if_modules_type_2_has_at_leat_2_meetings():
     return True
 
 def check_if_all_meetings_are_correct():
-    if (check_if_modules_type_2_has_at_leat_2_meetings and check_if_all_meetings_are_between_monday_and_thursday() and check_if_all_meetings_are_between_2021_and_2026() and check_if_employee_employed_before_course_start_date() and check_if_employee_dont_have_webinar_at_the_same_time() and check_if_employee_has_more_than_one_meeting_at_the_same_time and check_if_course_is_no_more_than_14_days() and check_if_all_modules_have_at_least_one_meeting()):
+    if (check_if_modules_type_2_has_at_leat_2_meetings and check_if_all_meetings_are_between_monday_and_thursday() and check_if_all_meetings_are_between_2021_and_2026() and check_if_employee_dont_have_webinar_at_the_same_time() and check_if_employee_has_more_than_one_meeting_at_the_same_time and check_if_course_is_no_more_than_14_days() and check_if_all_modules_have_at_least_one_meeting() and check_if_modules_type_2_has_at_leat_2_meetings()):
         print("All meetings are correct")
     else:
         print("Meetings are not correct")
