@@ -23,11 +23,11 @@ online_course_meetings_csv = "../Tables Data/OnlineCourseMeeting.csv"
 online_course_meetings = wczystaj_liste_z_csv(online_course_meetings_csv)
 stationary_course_meetings_csv = "../Tables Data/StationaryCourseMeeting.csv"
 stationary_course_meetings = wczystaj_liste_z_csv(stationary_course_meetings_csv)
-order_details_csv = "../Tables Data/order_details1.csv"
+order_details_csv = "../Tables Data/OrderDetails.csv"
 order_details = wczystaj_liste_z_csv(order_details_csv)
 users_csv = "../Tables Data/Users.csv"
 users = wczystaj_liste_z_csv(users_csv)
-orders_csv = "../Tables Data/orders.csv"
+orders_csv = "../Tables Data/Orders.csv"
 orders = wczystaj_liste_z_csv(orders_csv)
 studies_csv = "../Tables Data/Studies.csv"
 studies = wczystaj_liste_z_csv(studies_csv)
@@ -281,7 +281,7 @@ while i<len(course_and_webinars_orders):
         if detail[1]=='2':
             payment_date = date_of_order + timedelta(minutes=random.randint(1, 10))
             status = 'udane'
-            advances_to_add.append([detail[0], round(0.1*float(price),2), payment_date, status])
+            advances_to_add.append([curr_detail_id, round(0.1*float(price),2), payment_date, status])
         curr_detail_id+=1
     i = j
 
