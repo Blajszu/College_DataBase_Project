@@ -4,7 +4,7 @@ os.chdir(os.path.dirname(__file__))
 
 meetings_csv = "../Tables Data/StationaryCourseMeeting.csv"
 courses_csv = "../Tables Data/Courses.csv"
-modules_csv = "../Tables Data/new_modules.csv"
+modules_csv = "../Tables Data/CourseModules.csv"
 users = "../Tables Data/Users.csv"
 rooms = "../Tables Data/Rooms.csv"
 
