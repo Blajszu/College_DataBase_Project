@@ -29,7 +29,7 @@ CREATE TABLE Countries (
 CREATE TABLE CourseModules (
     ModuleID int  NOT NULL IDENTITY(1,1),
     CourseID int  NOT NULL,
-    ModuleName varchar(40)  NOT NULL,
+    ModuleName varchar(255)  NOT NULL,
     ModuleType int  NOT NULL,
     LecturerID int  NOT NULL,
     LanguageID int  NOT NULL,
@@ -227,7 +227,7 @@ CREATE TABLE StudyMeetingPayment (
     Price money  NOT NULL,
     PaidDate datetime  NULL,
     PaymentStatus varchar(40)  NULL,
-    CONSTRAINT StudyMeetingPayment_pk PRIMARY KEY  (DetailID)
+    CONSTRAINT StudyMeetingPayment_pk PRIMARY KEY  (DetailID, MeetingID)
 );
 
 -- Table: StudyMeetingPresence
@@ -422,25 +422,10 @@ ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_ActivitiesTypes
     FOREIGN KEY (TypeOfActivity)
     REFERENCES ActivitiesTypes (ActivityTypeID);
 
--- Reference: OrderDetails_Courses (table: OrderDetails)
-ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_Courses
-    FOREIGN KEY (ActivityID)
-    REFERENCES Courses (CourseID);
-
--- Reference: OrderDetails_Studies (table: OrderDetails)
-ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_Studies
-    FOREIGN KEY (ActivityID)
-    REFERENCES Studies (StudiesID);
-
 -- Reference: OrderDetails_StudyMeetingPayment (table: StudyMeetingPayment)
 ALTER TABLE StudyMeetingPayment ADD CONSTRAINT OrderDetails_StudyMeetingPayment
     FOREIGN KEY (DetailID)
     REFERENCES OrderDetails (DetailID);
-
--- Reference: OrderDetails_StudyMeetings (table: OrderDetails)
-ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_StudyMeetings
-    FOREIGN KEY (ActivityID)
-    REFERENCES StudyMeetings (MeetingID);
 
 -- Reference: OrderDetails_Webinars (table: OrderDetails)
 ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_Webinars
