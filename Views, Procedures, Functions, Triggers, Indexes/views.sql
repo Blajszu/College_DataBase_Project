@@ -852,3 +852,57 @@ LEFT OUTER JOIN ActivityInsteadOfAbsence aioa
 WHERE 
   smp.presence = 0 
   AND aioa.MeetingID IS NULL;
+
+
+
+
+
+
+--wszystkie spotkania studyjne użytkowników
+CREATE VIEW VW_allUsersStudyMeetings
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
+SubjectName, StartTime, EndTime, StudyMeetingPayment.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+WHERE OrderDetails.TypeOfActivity=3
+
+--wszystkie spotkania kursów użytkowników
+CREATE VIEW VW_allUsersCourseMeetings
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    StationaryCourseMeeting.StartDate, 
+    StationaryCourseMeeting.EndDate, 
+    OrderDetails.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    OnlineCourseMeeting.StartDate, 
+    OnlineCourseMeeting.EndDate, 
+    OrderDetails.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID;
