@@ -827,3 +827,28 @@ SELECT C.CourseID, CourseName, CM.ModuleID, ModuleName, StudentID, FirstName, La
 INNER JOIN CourseModules CM on CourseModulesPassed.ModuleID = CM.ModuleID
 INNER JOIN dbo.Courses C on CM.CourseID = C.CourseID
 INNER JOIN dbo.Users U on CourseModulesPassed.StudentID = U.UserID
+CREATE VIEW vw_MeetingsWithAbsences AS
+SELECT 
+  smp.StudyMeetingID, 
+  smp.StudentID,
+  smp.Presence,
+  1 as OtherActivityPresence 
+FROM StudyMeetingPresence smp
+INNER JOIN ActivityInsteadOfAbsence aioa 
+  ON aioa.MeetingID = smp.StudyMeetingID 
+  AND aioa.StudentID = smp.StudentID
+
+UNION
+
+SELECT 
+  smp.StudyMeetingID, 
+  smp.StudentID,
+  smp.Presence,
+  0 as OtherActivityPresence 
+FROM StudyMeetingPresence smp
+LEFT OUTER JOIN ActivityInsteadOfAbsence aioa 
+  ON aioa.MeetingID = smp.StudyMeetingID 
+  AND aioa.StudentID = smp.StudentID
+WHERE 
+  smp.presence = 0 
+  AND aioa.MeetingID IS NULL;

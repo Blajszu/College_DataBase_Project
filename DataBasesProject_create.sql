@@ -659,7 +659,10 @@ ALTER TABLE OnlineMeetings ADD CONSTRAINT CHK_OnlineMeetings_StudentLimit CHECK 
 
 -- OrderDetails
 ALTER TABLE OrderDetails ADD CONSTRAINT CHK_OrderDetails_Price CHECK (Price >= 0);
+ALTER TABLE OrderDetails ADD CONSTRAINT CHK_OrderDetails_PaymentStatus CHECK (PaymentStatus in ('udana', 'nieudana'))  
 
+-- Orders
+ALTER TABLE Orders ADD CONSTRAINT CHK_Orders_DeferredDate CHECK (DeferredDate > OrderDate)
 -- Roles
 ALTER TABLE Roles ADD CONSTRAINT UQ_Roles_RoleName UNIQUE (RoleName);
 
@@ -669,6 +672,11 @@ ALTER TABLE Rooms ADD CONSTRAINT CHK_Rooms_Limit CHECK (Limit > 0);
 -- Studies
 ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_StudyPrice CHECK (StudyPrice >= 0);
 ALTER TABLE Studies ADD CONSTRAINT CHK_Studies_NumberOfTerms CHECK (NumberOfTerms > 0);
+
+--StudyMeetingPayment
+ALTER TABLE StudyMeetingPayment ADD CONSTRAINT CHK_StudyMeetingPayment_PaymentStatus CHECK (PaymentStatus in ('udana', 'nieudana'));
+ALTER TABLE StudyMeetingPayment ADD CONSTRAINT CHK_StudyMeetingPayment_Price CHECK (Price > 0);
+
 
 -- StudyMeetings
 ALTER TABLE StudyMeetings ADD CONSTRAINT CHK_StudyMeetings_StartEndTimes CHECK (StartTime < EndTime);
@@ -690,5 +698,7 @@ ALTER TABLE Webinars ADD CONSTRAINT CHK_Webinars_Price CHECK (Price >= 0);
 -- PaymentsAdvances
 ALTER TABLE PaymentsAdvances
 ADD CONSTRAINT CHK_PaymentsAdvances_AdvancePrice CHECK (AdvancePrice >= 0);
+
+ALTER TABLE PaymentsAdvances ADD CONSTRAINT CHK_PaymentsAdvances_AdvancePaymentStatus CHECK (AdvancePaymentStatus in ('udana', 'nieudana'))
 
 -- End of file.
