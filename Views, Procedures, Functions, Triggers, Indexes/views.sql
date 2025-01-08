@@ -43,9 +43,7 @@ SELECT
     O.OrderDate,
     O.PaymentDeferred,
     OD.ActivityID,
-    AT.TypeName AS ActivityType,
-    OD.Price,
-    OD.PaymentStatus
+    AT.TypeName AS ActivityType
 FROM Orders O
 JOIN OrderDetails OD ON O.OrderID = OD.OrderID
 JOIN ActivitiesTypes AT ON OD.TypeOfActivity = AT.ActivityTypeID;
@@ -70,7 +68,7 @@ SELECT
     S.SubjectID,
     S.SubjectName,
     G.GradeName,
-	COUNT(U.UserID)
+	COUNT(U.UserID) as StudentsNum
 FROM SubjectsResults SR
 JOIN Subjects S ON SR.SubjectID = S.SubjectID
 JOIN Users U ON SR.StudentID = U.UserID
@@ -110,6 +108,7 @@ SELECT
     I.EndDate,
     U.FirstName AS StudentFirstName,
     U.LastName AS StudentLastName
+    (IIF IP.Passed=1, 'Zaliczone', 'Nie zaliczone') AS Passed
 FROM Internship I
 JOIN InternshipPassed IP ON I.InternshipID = IP.InternshipID
 JOIN Users U ON IP.StudentID = U.UserID
@@ -194,7 +193,7 @@ SELECT Users.FirstName, Users.LastName, C.CourseName,
 		INNER JOIN CourseModules ON CourseModules.ModuleID=OnlineCourseMeeting.ModuleID
 		INNER JOIN Courses ON Courses.CourseID=CourseModules.CourseID
 		WHERE Courses.CourseID = C.CourseID)
-	) as t) as courseStart,
+	) as t) as CourseStart,
 
 	(SELECT (DATENAME(DAY,MAX(t.last_meeting_date)) + ' ' + DATENAME(MONTH,MAX(t.last_meeting_date)) + ' ' + DATENAME(YEAR,MAX(t.last_meeting_date))) as end_date  
 	FROM(
@@ -669,3 +668,54 @@ WHERE (
 	INNER JOIN Courses C1 ON C1.CourseID=CourseModules.CourseID
 	WHERE C1.CourseID=C.CourseID) >= 0.8
 
+
+CREATE VIEW vw_InternshipCoordinators AS
+SELECT FirstName, LastName 
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Koordynator praktyk')
+
+CREATE VIEW vw_CourseCoordinators AS
+SELECT FirstName, LastName 
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Koordynator kursu')
+
+
+CREATE VIEW vw_WebinarTeachers AS
+SELECT FirstName, LastName 
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Prowadzący webinaru')
+
+CREATE VIEW vw_StudyCoordinator AS
+SELECT FirstName, LastName 
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Koordynator studiów')
+
+CREATE VIEW vw_CoursesLecturers AS
+SELECT FirstName, LastName 
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Prowadzący kursu')
+
+CREATE VIEW vw_Students AS
+SELECT FirstName, LastName 
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Student')
+
+CREATE VIEW vw_TranslatorsWithLanguages AS
+SELECT FirstName, LastName, LanguageName
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+INNER JOIN TranslatedLanguage ON TranslatedLanguage.TranslatorID=Users.UserID
+INNER JOIN Languages ON Languages.LanguageID=TranslatedLanguage.LanguageID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Tłumacz')
+
+CREATE VIEW vw_Lecturers AS
+SELECT FirstName, LastName 
+FROM Users
+INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
+WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Wykładowca')
