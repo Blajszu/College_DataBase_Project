@@ -326,23 +326,18 @@ CREATE TABLE Webinars (
 );
 
 -- foreign keys
---Reference: MeetingWithAbsence_Meeting (table: ActivityInsteadOfAbsence)
-ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT MeetingWithAbsence_Meeting
-    FOREIGN KEY (MeetingID)
-    REFERENCES StudyMeetingPresence (StudyMeetingID)
-
---Reference: AbsentStudent_Student (table: ActivityInsteadOfAbsence)
-ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudent_Student
-    FOREIGN KEY (StudentID)
-    REFERENCES StudyMeetingPresence (StudentID)
+--Reference: MeetingWithAbsenceStdentWhoWasAbsent_MeetingStudent (table: ActivityInsteadOfAbsence)
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT MeetingWithAbsenceStdentWhoWasAbsent_MeetingStudent
+    FOREIGN KEY (MeetingID, StudentID)
+    REFERENCES StudyMeetingPresence (StudyMeetingID, StudentID)
 
 --Reference: AbsentStudentStudiesActivity_Activity (table: ActivityInsteadOfAbsence)
-ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudentActivity_Activity
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudentStudiesActivity_Activity
     FOREIGN KEY (ActivityID)
     REFERENCES StudyMeetings (MeetingID)
 
 --Reference: AbsentStudentCourseActivity_Activity (table: ActivityInsteadOfAbsence)
-ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudentActivity_Activity
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudentCourseActivity_Activity
     FOREIGN KEY (ActivityID)
     REFERENCES Courses (CourseID)
 
