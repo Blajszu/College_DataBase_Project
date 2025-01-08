@@ -719,3 +719,57 @@ SELECT FirstName, LastName
 FROM Users
 INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
 WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Wykładowca')
+
+
+CREATE VIEW vw_PresenceOnPastStudyMeeting AS
+WITH t1 AS (
+    SELECT 
+        sm.MeetingID, 
+        COUNT(smp.Presence) AS NumberOfAttendees, 
+        (
+            SELECT 
+                COUNT(DISTINCT od.OrderID) AS NumberOfPurchases
+            FROM
+                StudyMeetings sm1
+            LEFT JOIN 
+                Subjects s ON s.SubjectID = sm1.SubjectID
+            LEFT JOIN 
+                Studies st ON s.StudiesID = st.StudiesID
+            LEFT JOIN
+                OrderDetails od ON (od.ActivityID = sm1.MeetingID AND od.TypeOfActivity = 4)
+                                OR (od.ActivityID = st.StudiesID AND od.TypeOfActivity = 3)
+            WHERE sm1.MeetingID = sm.MeetingID
+            GROUP BY
+                sm1.MeetingID
+        ) AS NumberOfPurchases
+    FROM 
+        StudyMeetings sm
+    LEFT JOIN 
+        StudyMeetingPresence smp ON smp.StudyMeetingID = sm.MeetingID AND smp.Presence = 1
+	WHERE EndTime < '2025-01-01'
+    GROUP BY 
+        sm.MeetingID
+)
+
+SELECT 
+    t2.MeetingID,ROUND((CAST(NumberOfAttendees AS FLOAT) / CAST(NumberOfPurchases AS FLOAT)) * 100, 2) AS PercentOfPresentStudents
+FROM 
+    t2;
+
+
+CREATE VIEW vw_PresenceOnPastStudyMeeting AS
+SELECT 
+    smp.StudentID, 
+    sm.SubjectID, 
+    CAST (SUM(CAST(smp.Presence AS INT)) * 1.0 / COUNT(*) * 100 AS INT) AS AttendancePercentage 
+FROM 
+    StudyMeetingPresence smp
+INNER JOIN 
+    StudyMeetings sm ON sm.MeetingID = smp.StudyMeetingID
+GROUP BY 
+    smp.StudentID, 
+    sm.SubjectID
+ORDER BY 
+    AttendancePercentage;
+
+
