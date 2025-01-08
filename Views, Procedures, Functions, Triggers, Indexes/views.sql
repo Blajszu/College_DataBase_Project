@@ -722,7 +722,7 @@ WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Wykładowca'
 
 
 CREATE VIEW vw_PresenceOnPastStudyMeeting AS
-WITH t1 AS (
+WITH t2 AS (
     SELECT 
         sm.MeetingID, 
         COUNT(smp.Presence) AS NumberOfAttendees, 
@@ -769,7 +769,5 @@ INNER JOIN
 GROUP BY 
     smp.StudentID, 
     sm.SubjectID
-ORDER BY 
-    AttendancePercentage;
 
 
