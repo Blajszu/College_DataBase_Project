@@ -821,3 +821,9 @@ WHERE Courses.CourseID IN (
     SELECT id FROM VW_CoursesStartDateEndDate
     WHERE [Data rozpoczęcia] < '2025-01-01' AND [Data zakończenia] > '2025-01-01'
 )
+
+CREATE VIEW VW_CourseModulesPassed AS
+SELECT C.CourseID, CourseName, CM.ModuleID, ModuleName, StudentID, FirstName, LastName, Passed FROM CourseModulesPassed
+INNER JOIN CourseModules CM on CourseModulesPassed.ModuleID = CM.ModuleID
+INNER JOIN dbo.Courses C on CM.CourseID = C.CourseID
+INNER JOIN dbo.Users U on CourseModulesPassed.StudentID = U.UserID
