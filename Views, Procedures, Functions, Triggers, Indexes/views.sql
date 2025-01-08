@@ -886,6 +886,7 @@ INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
 INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
 INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
 INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2
 
 UNION
 
@@ -903,7 +904,489 @@ INNER JOIN Orders ON Orders.StudentID = Users.UserID
 INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
 INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
 INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
-INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID;
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2
+
+--wszystkie webinaria użytkowników
+CREATE VIEW VW_allUsersWebinars AS
+SELECT Users.UserID, Users.FirstName, Users.LastName, Webinars.WebinarName, Webinars.StartDate, Webinars.EndDate, OrderDetails.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1
+
+--wszytskie spotkania do których jest przypisany użytkownik
+CREATE VIEW VW_allUsersMeetings AS
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
+StartTime, EndTime, StudyMeetingPayment.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+WHERE OrderDetails.TypeOfActivity=3
+
+UNION 
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    StationaryCourseMeeting.StartDate as StartTime, 
+    StationaryCourseMeeting.EndDate as EndTime, 
+    OrderDetails.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON ActivitiesTypes.ActivityTypeID=OrderDetails.ActivityID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    OnlineCourseMeeting.StartDate as StartTime, 
+    OnlineCourseMeeting.EndDate as EndTime, 
+    OrderDetails.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON OrderDetails.TypeOfActivity = ActivitiesTypes.ActivityTypeID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2
+
+UNION
+
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+Webinars.WebinarName as ActivityName, Webinars.StartDate as StartTime, Webinars.EndDate as EndTime, OrderDetails.PaymentStatus
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1
+
+--wszystkie przeszłe studyjne użytkowników
+CREATE VIEW VW_allUsersPastStudyMeetings
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
+SubjectName, StartTime, EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+WHERE OrderDetails.TypeOfActivity=3 AND StudyMeetings.EndTime<GETDATE()
+
+--wszystkie przeszłe kursy użytkowników
+CREATE VIEW VW_allUsersPastCourseMeetings
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    StationaryCourseMeeting.StartDate, 
+    StationaryCourseMeeting.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND EndDate<GETDATE()
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    OnlineCourseMeeting.StartDate, 
+    OnlineCourseMeeting.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND EndDate<GETDATE()
+
+--wszystkie przeszłe webinaria użytkowników
+CREATE VIEW VW_allPastUsersWebinars AS
+SELECT Users.UserID, Users.FirstName, Users.LastName, Webinars.WebinarName, Webinars.StartDate, Webinars.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1 AND EndDate<GETDATE()
+
+--wszytskie przeszłe spotkania użytkowników
+CREATE VIEW VW_allUsersPastMeetings AS
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
+StartTime, EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+WHERE OrderDetails.TypeOfActivity=3 AND EndTime < GETDATE()
+
+UNION 
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    StationaryCourseMeeting.StartDate as StartTime, 
+    StationaryCourseMeeting.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON ActivitiesTypes.ActivityTypeID=OrderDetails.ActivityID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND EndDate < GETDATE()
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    OnlineCourseMeeting.StartDate as StartTime, 
+    OnlineCourseMeeting.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON OrderDetails.TypeOfActivity = ActivitiesTypes.ActivityTypeID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND EndDate < GETDATE()
+
+UNION
+
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+Webinars.WebinarName as ActivityName, Webinars.StartDate as StartTime, Webinars.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1 AND EndDate < GETDATE()
+
+
+--wszystkie przyszłe spotkania studyjne użytkowników
+CREATE VIEW VW_allUsersFutureStudyMeetings
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
+SubjectName, StartTime, EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+WHERE OrderDetails.TypeOfActivity=3 AND StudyMeetings.StartTime>GETDATE()
+
+--wszystkie przyszłe spotkania kursowe użytkowników
+CREATE VIEW VW_allUsersFutureCourseMeetings
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    StationaryCourseMeeting.StartDate, 
+    StationaryCourseMeeting.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate>GETDATE()
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    OnlineCourseMeeting.StartDate, 
+    OnlineCourseMeeting.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate>GETDATE()
+
+--wszystkie przeszłe webinaria użytkowników
+CREATE VIEW VW_allUsersFutureWebinars
+SELECT Users.UserID, Users.FirstName, Users.LastName, Webinars.WebinarName, Webinars.StartDate, Webinars.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1 AND StartDate>GETDATE()
+
+
+--wszytskie przyszłe spotkania do których jest przypisany użytkownik
+CREATE VIEW VW_allUsersFutureMeetings
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
+StartTime, EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+WHERE OrderDetails.TypeOfActivity=3 AND StartTime > GETDATE()
+
+UNION 
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    StationaryCourseMeeting.StartDate as StartTime, 
+    StationaryCourseMeeting.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON ActivitiesTypes.ActivityTypeID=OrderDetails.ActivityID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate > GETDATE()
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    OnlineCourseMeeting.StartDate as StartTime, 
+    OnlineCourseMeeting.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON OrderDetails.TypeOfActivity = ActivitiesTypes.ActivityTypeID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate > GETDATE()
+
+UNION
+
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+Webinars.WebinarName as ActivityName, Webinars.StartDate as StartTime, Webinars.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1 AND StartDate > GETDATE()
+
+--wszystkie aktualnie trwające spotkania studyjne użytkowników
+CREATE VIEW VW_allUsersCurrentStudyMeetings
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
+SubjectName, StartTime, EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+WHERE OrderDetails.TypeOfActivity=3 AND StudyMeetings.StartTime<GETDATE() AND StudyMeetings.StartTime>GETDATE()
+
+--wszystkie aktualne spotkania kursowe użytkowników
+CREATE VIEW VW_allUsersCurrentCourseMeetings
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    StationaryCourseMeeting.StartDate, 
+    StationaryCourseMeeting.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate<GETDATE() AND EndDate>GETDATE()
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+    Courses.CourseName AS NazwaKursu, 
+    CourseModules.ModuleName AS NazwaModulu, 
+    OnlineCourseMeeting.StartDate, 
+    OnlineCourseMeeting.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate<GETDATE() AND EndDate>GETDATE()
+
+--wszystkie aktualne webinaria użytkowników
+CREATE VIEW VW_allUsersCurrentWebinars AS
+SELECT Users.UserID, Users.FirstName, Users.LastName, Webinars.WebinarName, Webinars.StartDate, Webinars.EndDate
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1 AND StartDate<GETDATE() AND EndDate>GETDATE()
+
+
+--wszytskie aktualnie trwające spotkania do których jest przypisany użytkownik
+CREATE VIEW VW_allUsersCurrentMeetings
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
+StartTime, EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+LEFT JOIN StationaryMeetings ON StationaryMeetings.MeetingID=StudyMeetings.MeetingID
+WHERE OrderDetails.TypeOfActivity=3 AND StartTime<GETDATE() AND EndTime>GETDATE()
+
+UNION 
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    StationaryCourseMeeting.StartDate as StartTime, 
+    StationaryCourseMeeting.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON ActivitiesTypes.ActivityTypeID=OrderDetails.ActivityID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate<GETDATE() AND EndDate>GETDATE()
+
+UNION
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    OnlineCourseMeeting.StartDate as StartTime, 
+    OnlineCourseMeeting.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON OrderDetails.TypeOfActivity = ActivitiesTypes.ActivityTypeID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate < GETDATE() AND EndDate > GETDATE()
+
+UNION
+
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+Webinars.WebinarName as ActivityName, Webinars.StartDate as StartTime, Webinars.EndDate as EndTime
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON Orders.OrderID=OrderDetails.OrderID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1 AND StartDate < GETDATE() AND EndDate > GETDATE()
+
+--wszystkie aktualnie trwające stacjonarne spotkania wraz z salą i adresem
+CREATE VIEW VW_allUsersStationaryMeetingsWithRoomAndAddresses
+SELECT Users.UserID, Users.FirstName, Users.LastName, 
+(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+(SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
+StartTime, EndTime, Rooms.RoomName, Rooms.Street, PostalCode, CityName
+FROM Users
+INNER JOIN Orders ON Orders.StudentID=Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.DetailID=OrderDetails.DetailID
+INNER JOIN StudyMeetings ON StudyMeetings.MeetingID=StudyMeetingPayment.MeetingID
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+LEFT JOIN StationaryMeetings ON StationaryMeetings.MeetingID=StudyMeetings.MeetingID
+LEFT JOIN Rooms ON Rooms.RoomID=StationaryMeetings.RoomID
+LEFT JOIN Cities ON Cities.CityID=Rooms.CityID
+WHERE OrderDetails.TypeOfActivity=3 AND StartTime<GETDATE() AND EndTime>GETDATE()
+
+UNION 
+
+SELECT 
+    Users.UserID, 
+    Users.FirstName, 
+    Users.LastName, 
+	(SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
+    Courses.CourseName AS ActivityName, 
+    StationaryCourseMeeting.StartDate as StartTime, 
+    StationaryCourseMeeting.EndDate as EndTime,
+	Rooms.RoomName, Rooms.Street, PostalCode, CityName
+FROM Users
+INNER JOIN Orders ON Orders.StudentID = Users.UserID
+INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
+INNER JOIN ActivitiesTypes ON ActivitiesTypes.ActivityTypeID=OrderDetails.ActivityID
+INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
+INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
+INNER JOIN StationaryCourseMeeting ON StationaryCourseMeeting.ModuleID = CourseModules.ModuleID
+INNER JOIN Rooms ON Rooms.RoomID=StationaryCourseMeeting.RoomID
+INNER JOIN Cities ON Cities.CityID=Rooms.CityID
+WHERE OrderDetails.TypeOfActivity=2 AND StartDate<GETDATE() AND EndDate>GETDATE()
+
 
 
 CREATE VIEW VW_BilocationBetweenAllActivities AS
@@ -954,3 +1437,90 @@ JOIN
             AND t2.StartTime < t3.EndTime
             AND t2.EndTime > t3.StartTime
             AND t2.StartTime <> t3.StartTime
+
+
+CREATE VIEW VW_StudiesStartDateEndDate AS
+With t1 as
+(SELECT S2.StudiesID, CONCAT(DATENAME(MONTH, MIN(StudyMeetings.StartTime)),' ' + DATENAME(YEAR, MIN(StudyMeetings.StartTime))) as startDate
+        FROM StudyMeetings
+                 INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+                 INNER JOIN Studies S2 ON S2.StudiesID=Subjects.StudiesID
+				 GROUP BY S2.StudiesID)
+SELECT S2.StudiesID, t1.startDate, CONCAT(DATENAME(MONTH, MAX(StudyMeetings.EndTime)),' ' + DATENAME(YEAR, MAX(StudyMeetings.EndTime))) as endDate
+FROM StudyMeetings
+INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
+INNER JOIN Studies S2 ON S2.StudiesID=Subjects.StudiesID
+INNER JOIN t1 ON t1.studiesID=S2.StudiesID
+GROUP BY S2.StudiesID, t1.startDate
+
+
+CREATE VIEW VW_allActivities AS
+SELECT ActivityID, 
+(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
+Studies.StudyName as ActivityName, 
+vw.StartDate, vw.EndDate
+FROM Orders 
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN VW_StudiesStartDateEndDate vw ON vw.studiesid=OrderDetails.ActivityID
+INNER JOIN Studies ON Studies.StudiesID=OrderDetails.ActivityID
+WHERE TypeOfActivity=3
+UNION
+SELECT ActivityID, 
+(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
+Courses.CourseName as ActivityName,
+DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH, vw.[Data rozpoczęcia])+' '+ DATENAME(YEAR, vw.[Data rozpoczęcia]) as StartDate, 
+DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH,vw.[Data zakończenia]) + ' ' +DATENAME(YEAR,vw.[Data zakończenia]) as EndDate
+FROM Orders 
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
+INNER JOIN Courses ON Courses.CourseID=OrderDetails.ActivityID
+WHERE TypeOfActivity=2
+UNION
+SELECT ActivityID, 
+(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
+Webinars.WebinarName as ActivityName,
+DATENAME(DAY,StartDate)+' '+DATENAME(MONTH,StartDate)+' '+DATENAME(YEAR,StartDate)+' '+DATENAME(HOUR,StartDate)+':'+DATENAME(MINUTE,StartDate),
+DATENAME(DAY,EndDate)+' '+DATENAME(MONTH,EndDate)+' '+DATENAME(YEAR,EndDate)+' '+DATENAME(HOUR,EndDate)+':'+DATENAME(MINUTE,EndDate)
+FROM Orders 
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1
+
+
+CREATE VIEW VW_allFutureActivities AS
+SELECT ActivityID, 
+(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
+Studies.StudyName as ActivityName, 
+vw.StartDate, vw.EndDate
+FROM Orders 
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN VW_StudiesStartDateEndDate vw ON vw.studiesid=OrderDetails.ActivityID
+INNER JOIN Studies ON Studies.StudiesID=OrderDetails.ActivityID
+WHERE TypeOfActivity=3 AND StartDate>GETDATE()
+UNION
+SELECT ActivityID, 
+(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
+Courses.CourseName as ActivityName,
+DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH, vw.[Data rozpoczęcia])+' '+ DATENAME(YEAR, vw.[Data rozpoczęcia]) as StartDate, 
+DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH,vw.[Data zakończenia]) + ' ' +DATENAME(YEAR,vw.[Data zakończenia]) as EndDate
+FROM Orders 
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
+INNER JOIN Courses ON Courses.CourseID=OrderDetails.ActivityID
+WHERE TypeOfActivity=2 AND 
+DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH, vw.[Data rozpoczęcia])+' '+ DATENAME(YEAR, vw.[Data rozpoczęcia]) >GETDATE()
+UNION
+SELECT ActivityID, 
+(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
+Webinars.WebinarName as ActivityName,
+DATENAME(DAY,StartDate)+' '+DATENAME(MONTH,StartDate)+' '+DATENAME(YEAR,StartDate)+' '+DATENAME(HOUR,StartDate)+':'+DATENAME(MINUTE,StartDate),
+DATENAME(DAY,EndDate)+' '+DATENAME(MONTH,EndDate)+' '+DATENAME(YEAR,EndDate)+' '+DATENAME(HOUR,EndDate)+':'+DATENAME(MINUTE,EndDate)
+FROM Orders 
+INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
+INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
+WHERE TypeOfActivity=1 AND 
+DATENAME(DAY,StartDate)+' '+DATENAME(MONTH,StartDate)+' '+DATENAME(YEAR,StartDate)+' '+DATENAME(HOUR,StartDate)+':'+DATENAME(MINUTE,StartDate) > GETDATE()
+
+
