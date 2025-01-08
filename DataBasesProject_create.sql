@@ -9,6 +9,15 @@ CREATE TABLE ActivitiesTypes (
     CONSTRAINT ActivitiesTypes_pk PRIMARY KEY  (ActivityTypeID)
 );
 
+-- Table: ActivityInsteadofAbsence
+CREATE TABLE ActivityInsteadOfAbsence (
+    MeetingID int NOT NULL,
+    StudentID int NOT NULL,
+    ActivityID int NOT NULL,
+    TypeOfActivity int NOT NULL,
+    CONSTRAINT ActivityInsteadOfAbsence_pk PRIMARY KEY (MeetingID, StudentID), 
+)
+
 -- Table: Cities
 CREATE TABLE Cities (
     CityID int  NOT NULL IDENTITY(1,1),
@@ -317,6 +326,31 @@ CREATE TABLE Webinars (
 );
 
 -- foreign keys
+--Reference: MeetingWithAbsence_Meeting (table: ActivityInsteadOfAbsence)
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT MeetingWithAbsence_Meeting
+    FOREIGN KEY (MeetingID)
+    REFERENCES StudyMeetingPresence (StudyMeetingID)
+
+--Reference: AbsentStudent_Student (table: ActivityInsteadOfAbsence)
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudent_Student
+    FOREIGN KEY (StudentID)
+    REFERENCES StudyMeetingPresence (StudentID)
+
+--Reference: AbsentStudentStudiesActivity_Activity (table: ActivityInsteadOfAbsence)
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudentActivity_Activity
+    FOREIGN KEY (ActivityID)
+    REFERENCES StudyMeetings (MeetingID)
+
+--Reference: AbsentStudentCourseActivity_Activity (table: ActivityInsteadOfAbsence)
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudentActivity_Activity
+    FOREIGN KEY (ActivityID)
+    REFERENCES Courses (CourseID)
+
+--Reference: AbsentStudentTypeOfActivity_TypeOfActivity (table: ActivityInsteadOfAbsence)
+ALTER TABLE ActivityInsteadOfAbsence ADD CONSTRAINT AbsentStudentTypeOfActivity_TypeOfActivity
+    FOREIGN KEY (TypeOfActivity)
+    REFERENCES ActivitiesTypes (ActivityTypeID)
+
 -- Reference: City_User (table: Users)
 ALTER TABLE Users ADD CONSTRAINT City_User
     FOREIGN KEY (CityID)
