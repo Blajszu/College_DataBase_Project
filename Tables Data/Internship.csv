@@ -1,4 +1,4 @@
-﻿InternshipID,StudiesID,InternshipCoordinatorID,StartDate,EndDate,NumberOfHours,Term
+InternshipID,StudiesID,InternshipCoordinatorID,StartDate,EndDate,NumberOfHours,Term
 1,1,532,2026-11-09,2026-11-23,50,1
 2,1,532,2027-05-10,2027-05-24,50,2
 3,1,600,2027-12-06,2027-12-20,50,3
