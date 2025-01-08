@@ -724,7 +724,7 @@ FROM Users
          INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
 WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Wykładowca')
 
-CREATE VIEW vw_ AS PresenceOnPastStudyMeeting
+CREATE VIEW vw_PresenceOnPastStudyMeeting AS
 WITH t2 AS (
     SELECT 
         sm.MeetingID, 
@@ -856,10 +856,8 @@ WHERE
 
 
 
-
-
 --wszystkie spotkania studyjne użytkowników
-CREATE VIEW VW_allUsersStudyMeetings
+CREATE VIEW VW_allUsersStudyMeetings AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, 
 (SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
 SubjectName, StartTime, EndTime, StudyMeetingPayment.PaymentStatus
@@ -872,7 +870,7 @@ INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
 WHERE OrderDetails.TypeOfActivity=3
 
 --wszystkie spotkania kursów użytkowników
-CREATE VIEW VW_allUsersCourseMeetings
+CREATE VIEW VW_allUsersCourseMeetings AS
 SELECT 
     Users.UserID, 
     Users.FirstName, 
