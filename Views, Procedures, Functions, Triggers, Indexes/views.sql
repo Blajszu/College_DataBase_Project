@@ -17,10 +17,12 @@ SELECT
     C.CourseDescription,
     CM.ModuleID,
     CM.ModuleName,
+    TypeName AS 'Typ Modułu',
     L.LanguageName AS ModuleLanguage
 FROM Courses C
-         JOIN CourseModules CM ON C.CourseID = CM.CourseID
-         JOIN Languages L ON CM.LanguageID = L.LanguageID;
+JOIN CourseModules CM ON C.CourseID = CM.CourseID
+JOIN FormOfActivity ON CM.ModuleType = FormOfActivity.ActivityTypeID
+JOIN Languages L ON CM.LanguageID = L.LanguageID;
 
 CREATE VIEW vw_InternshipDetails AS
 SELECT
@@ -372,17 +374,17 @@ SELECT 'Studia' AS 'Typ',  StudiesID, StudyName, (
      WHERE ActivityID = StudiesID AND TypeOfActivity = 3 AND PaymentStatus = 'udana'
      GROUP BY ActivityID
     )
-        +
+    +
     (SELECT ISNULL(SUM(Price), 0) FROM StudyMeetingPayment
-                                           INNER JOIN StudyMeetings ON StudyMeetings.MeetingID = StudyMeetingPayment.MeetingID
-                                           INNER JOIN Subjects ON StudyMeetings.SubjectID = Subjects.SubjectID
+    INNER JOIN StudyMeetings ON StudyMeetings.MeetingID = StudyMeetingPayment.MeetingID
+    INNER JOIN Subjects ON StudyMeetings.SubjectID = Subjects.SubjectID
      WHERE Subjects.StudiesID = Studies.StudiesID AND PaymentStatus = 'udana'
      GROUP BY Subjects.StudiesID
     )
-        +
+    +
     (SELECT ISNULL(SUM(Price), 0) FROM Subjects
-                                           LEFT OUTER JOIN StudyMeetings ON Subjects.SubjectID = StudyMeetings.SubjectID
-                                           LEFT OUTER JOIN OrderDetails ON OrderDetails.ActivityID = StudyMeetings.MeetingID
+        LEFT OUTER JOIN StudyMeetings ON Subjects.SubjectID = StudyMeetings.SubjectID
+        LEFT OUTER JOIN OrderDetails ON OrderDetails.ActivityID = StudyMeetings.MeetingID
         AND TypeOfActivity = 4 AND PaymentStatus = 'udana'
      WHERE Subjects.StudiesID = Studies.StudiesID
      GROUP BY Subjects.StudiesID
@@ -394,20 +396,20 @@ FROM Studies
 --Dostępność sal
 CREATE VIEW VW_RoomsAvailability AS
 SELECT Rooms.RoomID, RoomName, StartDate, EndDate FROM Rooms
-                                                           INNER JOIN StationaryCourseMeeting ON Rooms.RoomID = StationaryCourseMeeting.RoomID
+INNER JOIN StationaryCourseMeeting ON Rooms.RoomID = StationaryCourseMeeting.RoomID
 UNION
 SELECT Rooms.RoomID, RoomName, StartTime, EndTime FROM Rooms
-                                                           INNER JOIN StationaryMeetings ON Rooms.RoomID = StationaryMeetings.RoomID
-                                                           INNER JOIN StudyMeetings ON StationaryMeetings.MeetingID = StudyMeetings.MeetingID
+INNER JOIN StationaryMeetings ON Rooms.RoomID = StationaryMeetings.RoomID
+INNER JOIN StudyMeetings ON StationaryMeetings.MeetingID = StudyMeetings.MeetingID
 
 
 
 --Liczba ludzi zapisanych na przyszłe webinary
 CREATE VIEW VW_NumberOfStudentsSignUpForFutureWebinars AS
 SELECT WebinarID, WebinarName, 'Zdalny' as 'Typ', COUNT(StudentID) as 'Liczba uczestników' FROM Webinars
-                                                                                                    LEFT OUTER JOIN OrderDetails ON OrderDetails.ActivityID = Webinars.WebinarID
-    AND TypeOfActivity = 1
-                                                                                                    LEFT OUTER JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
+LEFT OUTER JOIN OrderDetails ON OrderDetails.ActivityID = Webinars.WebinarID
+AND TypeOfActivity = 1
+LEFT OUTER JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
 WHERE StartDate > '2025-01-01 00:00'
 GROUP BY WebinarID, WebinarName
 
@@ -454,11 +456,11 @@ GROUP BY CourseID, CourseName
 --Liczba ludzi zapisanych na przyszłe spotkania studyjne
 CREATE VIEW VW_NumberOfStudentsSignUpForFutureStudyMeetings AS
 SELECT MeetingID, 'Spotkanie studyjne ' + STR(MeetingID) AS 'Nazwa spotkania',
-       (
-           (SELECT COUNT(*) FROM StudyMeetingPayment WHERE PaymentStatus = 'udana' AND StudyMeetingPayment.MeetingID = StudyMeetings.MeetingID)
-               +
-           (SELECT COUNT(*) FROM OrderDetails WHERE PaymentStatus = 'udana' AND TypeOfActivity = 4 AND ActivityID = StudyMeetings.MeetingID)
-           ) AS 'Liczba ludzi'
+        (
+        (SELECT COUNT(*) FROM StudyMeetingPayment WHERE PaymentStatus = 'udana' AND StudyMeetingPayment.MeetingID = StudyMeetings.MeetingID)
+            +
+        (SELECT COUNT(*) FROM OrderDetails WHERE PaymentStatus = 'udana' AND TypeOfActivity = 4 AND ActivityID = StudyMeetings.MeetingID)
+        ) AS 'Liczba ludzi'
 FROM StudyMeetings
 WHERE StartTime > '2025-01-01'
 
@@ -466,9 +468,9 @@ WHERE StartTime > '2025-01-01'
 --Liczba ludzi zapisanych na przyszłe wydarzenia razem
 CREATE VIEW VW_NumberOfStudentsSignUpForFutureAllFormOfEducation AS
 SELECT WebinarID, 'Webinar ' + WebinarName AS 'Nazwa Webinaru', 'Zdalny' as 'Typ', COUNT(StudentID) as 'Liczba uczestników' FROM Webinars
-                                                                                                                 LEFT OUTER JOIN OrderDetails ON OrderDetails.ActivityID = Webinars.WebinarID
-    AND TypeOfActivity = 1
-                                                                                                                 LEFT OUTER JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
+LEFT OUTER JOIN OrderDetails ON OrderDetails.ActivityID = Webinars.WebinarID
+AND TypeOfActivity = 1
+LEFT OUTER JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
 WHERE StartDate > '2025-01-01 00:00'
 GROUP BY WebinarID, WebinarName
 UNION
@@ -509,11 +511,11 @@ WHERE CourseID IN (
 GROUP BY CourseID, CourseName
 UNION
 SELECT MeetingID, 'Spotkanie studyjne ' + STR(MeetingID), IIF(MeetingType = 1, 'Stacjonarne', 'Zdalne'),
-       (
-           (SELECT COUNT(*) FROM StudyMeetingPayment WHERE PaymentStatus = 'udana' AND StudyMeetingPayment.MeetingID = StudyMeetings.MeetingID)
-               +
-           (SELECT COUNT(*) FROM OrderDetails WHERE PaymentStatus = 'udana' AND TypeOfActivity = 4 AND ActivityID = StudyMeetings.MeetingID)
-           )
+        (
+        (SELECT COUNT(*) FROM StudyMeetingPayment WHERE PaymentStatus = 'udana' AND StudyMeetingPayment.MeetingID = StudyMeetings.MeetingID)
+            +
+        (SELECT COUNT(*) FROM OrderDetails WHERE PaymentStatus = 'udana' AND TypeOfActivity = 4 AND ActivityID = StudyMeetings.MeetingID)
+        )
 FROM StudyMeetings
 WHERE StartTime > '2025-01-01'
 
@@ -521,55 +523,55 @@ WHERE StartTime > '2025-01-01'
 --Raport obecności na spotkaniach z imieniem, nazwiskiem i datą
 CREATE VIEW VW_StudyMeetingsPresenceWithFirstNameLastNameDate AS
 SELECT MeetingID, StartTime, FirstName, LastName, IIF(Presence = 1, 'Obecny', 'Nieobecny') AS 'Obecność' FROM StudyMeetingPresence
-                                                                                                    INNER JOIN StudyMeetings ON StudyMeetingPresence.StudyMeetingID = StudyMeetings.MeetingID
-                                                                                                    INNER JOIN Users ON StudyMeetingPresence.StudentID = Users.UserID
+INNER JOIN StudyMeetings ON StudyMeetingPresence.StudyMeetingID = StudyMeetings.MeetingID
+INNER JOIN Users ON StudyMeetingPresence.StudentID = Users.UserID
 
 
 --Raport języków i tłumaczy na webinarach
 CREATE VIEW VW_LanguagesAndTranslatorsOnWebinars AS
 SELECT WebinarID, WebinarName, LanguageName, ISNULL(FirstName, 'brak') AS 'FirstName', ISNULL(LastName, 'brak') AS 'LastName' FROM Webinars
-                                                                                                          INNER JOIN Languages ON Webinars.LanguageID = Languages.LanguageID
-                                                                                                          LEFT OUTER JOIN Employees ON Webinars.TranslatorID = Employees.EmployeeID
-                                                                                                          LEFT OUTER JOIN Users ON Employees.EmployeeID = Users.UserID
+INNER JOIN Languages ON Webinars.LanguageID = Languages.LanguageID
+LEFT OUTER JOIN Employees ON Webinars.TranslatorID = Employees.EmployeeID
+LEFT OUTER JOIN Users ON Employees.EmployeeID = Users.UserID
 
 
 --Raport języków i tłumaczy na kursach
 CREATE VIEW VW_LanguagesAndTranslatorsOnCourses AS
 SELECT Courses.CourseID, CourseName, LanguageName, ISNULL(FirstName, 'brak') AS 'FirstName', ISNULL(LastName, 'brak') AS 'LastName' FROM Courses
-                                                                                                                INNER JOIN CourseModules ON Courses.CourseID = CourseModules.CourseID
-                                                                                                                INNER JOIN Languages ON CourseModules.LanguageID = Languages.LanguageID
-                                                                                                                LEFT OUTER JOIN Employees ON CourseModules.TranslatorID = Employees.EmployeeID
-                                                                                                                LEFT OUTER JOIN Users ON Employees.EmployeeID = Users.UserID
+INNER JOIN CourseModules ON Courses.CourseID = CourseModules.CourseID
+INNER JOIN Languages ON CourseModules.LanguageID = Languages.LanguageID
+LEFT OUTER JOIN Employees ON CourseModules.TranslatorID = Employees.EmployeeID
+LEFT OUTER JOIN Users ON Employees.EmployeeID = Users.UserID
 
 
 --Raport języków i tłumaczy na studiach
 CREATE VIEW VW_LanguagesAndTranslatorsOnStudies AS
 SELECT Studies.StudiesID, StudyName, SubjectName, MeetingID, LanguageName, ISNULL(FirstName, 'brak') AS 'FirstName', ISNULL(LastName, 'brak') AS 'LastName' FROM Studies
-                                                                                                                                        INNER JOIN Subjects ON Studies.StudiesID = Subjects.StudiesID
-                                                                                                                                        INNER JOIN StudyMeetings ON Subjects.SubjectID = StudyMeetings.SubjectID
-                                                                                                                                        INNER JOIN Languages ON StudyMeetings.LanguageID = Languages.LanguageID
-                                                                                                                                        LEFT OUTER JOIN Employees ON StudyMeetings.TranslatorID = Employees.EmployeeID
-                                                                                                                                        LEFT OUTER JOIN Users ON Employees.EmployeeID = Users.UserID
+INNER JOIN Subjects ON Studies.StudiesID = Subjects.StudiesID
+INNER JOIN StudyMeetings ON Subjects.SubjectID = StudyMeetings.SubjectID
+INNER JOIN Languages ON StudyMeetings.LanguageID = Languages.LanguageID
+LEFT OUTER JOIN Employees ON StudyMeetings.TranslatorID = Employees.EmployeeID
+LEFT OUTER JOIN Users ON Employees.EmployeeID = Users.UserID
 
 
 --Miejsce zamieszakania studentów
 CREATE VIEW VW_StudentsPlaceOfLive AS
 SELECT Users.UserID, FirstName, LastName, CityName FROM Users
-                                                            INNER JOIN UsersRoles ON Users.UserID = UsersRoles.UserID
-    AND RoleID = 1
-                                                            INNER JOIN Cities ON Users.CityID = Cities.CityID
+INNER JOIN UsersRoles ON Users.UserID = UsersRoles.UserID
+AND RoleID = 1
+INNER JOIN Cities ON Users.CityID = Cities.CityID
 
 --Koordynatorzy studiów
 CREATE VIEW VW_StudiesCoordinators AS
 SELECT StudiesID, StudyName, FirstName, LastName FROM Studies
-                                                          INNER JOIN Employees ON Studies.StudiesCoordinatorID = Employees.EmployeeID
-                                                          INNER JOIN Users ON Employees.EmployeeID = Users.UserID
+INNER JOIN Employees ON Studies.StudiesCoordinatorID = Employees.EmployeeID
+INNER JOIN Users ON Employees.EmployeeID = Users.UserID
 
 --Koordynatorzy kursów
 CREATE VIEW VW_CoursesCoordinators AS
 SELECT CourseID, CourseName, FirstName, LastName FROM Courses
-                                                          INNER JOIN Employees ON Courses.CourseCoordinatorID = Employees.EmployeeID
-                                                          INNER JOIN Users ON Employees.EmployeeID = Users.UserID
+INNER JOIN Employees ON Courses.CourseCoordinatorID = Employees.EmployeeID
+INNER JOIN Users ON Employees.EmployeeID = Users.UserID
 
 --Czas rozpoczęcia i zakończenia dla każdego kursu
 CREATE VIEW VW_CoursesStartDateEndDate AS
@@ -809,3 +811,13 @@ CREATE VIEW defferedPayments AS
  FROM orders 
  INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
  WHERE Orders.PaymentDeferred=1
+
+CREATE VIEW VW_CurrentCoursesPassed AS
+SELECT Courses.CourseID, CourseName, CourseModules.ModuleID, ModuleName, StudentID, FirstName, LastName, Passed FROM Courses
+INNER JOIN CourseModules ON Courses.CourseID = CourseModules.CourseID
+LEFT OUTER JOIN CourseModulesPassed ON CourseModules.ModuleID = CourseModulesPassed.ModuleID
+LEFT OUTER JOIN Users ON CourseModulesPassed.StudentID = Users.UserID
+WHERE Courses.CourseID IN (
+    SELECT id FROM VW_CoursesStartDateEndDate
+    WHERE [Data rozpoczęcia] < '2025-01-01' AND [Data zakończenia] > '2025-01-01'
+)
