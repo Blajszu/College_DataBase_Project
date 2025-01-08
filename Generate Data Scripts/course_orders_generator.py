@@ -281,7 +281,7 @@ while i<len(course_and_webinars_orders):
         if detail[1]=='2':
             payment_date = date_of_order + timedelta(minutes=random.randint(1, 10))
             status = 'udane'
-            advances_to_add.append([detail[0], round(0.1*float(price),2), payment_date, status])
+            advances_to_add.append([curr_detail_id, round(0.1*float(price),2), payment_date, status])
         curr_detail_id+=1
     i = j
 
