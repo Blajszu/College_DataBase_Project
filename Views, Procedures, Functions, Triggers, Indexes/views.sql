@@ -906,3 +906,53 @@ INNER JOIN OrderDetails ON OrderDetails.OrderID = Orders.OrderID
 INNER JOIN Courses ON Courses.CourseID = OrderDetails.ActivityID
 INNER JOIN CourseModules ON CourseModules.CourseID = Courses.CourseID
 INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.ModuleID;
+
+
+CREATE VIEW VW_BilocationBetweenAllActivities AS
+WITH T1 (StudentID, StartTime, EndTime, TypeOfActivity, ActivityID) AS (
+        SELECT StudentID, StartDate, EndDate, 'Webinar', WebinarID FROM Orders
+        INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+        AND TypeOfActivity = 1
+        INNER JOIN Webinars ON WebinarID = OrderDetails.ActivityID
+        WHERE StartDate > '2025-01-01'
+        UNION
+        SELECT StudentID, StartDate, EndDate, 'Kurs', CM.CourseID FROM StationaryCourseMeeting
+        INNER JOIN dbo.CourseModules CM on StationaryCourseMeeting.ModuleID = CM.ModuleID
+        INNER JOIN Courses ON CM.CourseID = Courses.CourseID
+        INNER JOIN OrderDetails ON OrderDetails.ActivityID = Courses.CourseID
+        AND TypeOfActivity = 2
+        INNER JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
+        WHERE StartDate > '2025-01-01'
+        UNION
+        SELECT StudentID, StartTime, EndTime, 'Spotkanie studyjne', StudyMeetings.MeetingID FROM StudyMeetings
+        INNER JOIN StudyMeetingPayment ON StudyMeetingPayment.MeetingID = StudyMeetings.MeetingID
+        INNER JOIN OrderDetails ON OrderDetails.DetailID = StudyMeetingPayment.DetailID
+        AND TypeOfActivity = 3
+        INNER JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
+        WHERE StartTime > '2025-01-01'
+        UNION
+        SELECT Orders.StudentID, StartTime, EndTime, 'Spotkanie studyjne', MeetingID FROM Orders
+        INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+        AND TypeOfActivity = 4
+        INNER JOIN StudyMeetings ON StudyMeetings.MeetingID = OrderDetails.ActivityID
+        WHERE StartTime > '2025-01-01'
+)
+SELECT
+    t2.StudentID,
+    t2.StartTime AS StartTime1,
+    t2.EndTime AS EndTime1,
+    t2.TypeOfActivity AS Typ1,
+    t2.ActivityID AS 'ID Aktywności 1',
+    t3.StartTime AS StartTime2,
+    t3.EndTime AS EndTime2,
+    t3.TypeOfActivity AS Typ2,
+    t3.ActivityID AS 'Typ Aktywności 2'
+FROM
+    T1 AS t2
+JOIN
+    T1 AS t3
+    ON
+        t2.StudentID = t3.StudentID
+            AND t2.StartTime < t3.EndTime
+            AND t2.EndTime > t3.StartTime
+            AND t2.StartTime <> t3.StartTime
