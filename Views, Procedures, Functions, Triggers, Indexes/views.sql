@@ -178,7 +178,7 @@ INNER JOIN Users ON Users.UserID = StudiesResults.StudentID
 INNER JOIN Grades ON StudiesResults.GradeID=Grades.GradeID
 
 
---dyplomy kurs�w
+--certyfikaty kurs�w
 CREATE VIEW vw_CoursesCertificates AS
 SELECT Users.FirstName, Users.LastName, C.CourseName, 
 	(SELECT DATENAME(DAY,MIN(t.first_meeting_date)) + ' ' + DATENAME(MONTH,MIN(t.first_meeting_date)) + ' ' + DATENAME(YEAR,MIN(t.first_meeting_date))  as course_start_date
@@ -630,3 +630,42 @@ SELECT MeetingID, SubjectName, STR(DATEDIFF(minute, StartTime, EndTime)) + ' min
 ) AS 'Liczba zapisanych osób'
 FROM StudyMeetings
 INNER JOIN Subjects ON StudyMeetings.SubjectID = Subjects.SubjectID
+
+
+--Dla każdego użytkownika jego imię, nazwisko, email, telefon, adres zamieszkania
+CREATE VIEW VW_UsersPersonalData AS
+SELECT FirstName, LastName, Email, Phone, Street, PostalCode, CityName
+FROM Users
+INNER JOIN Cities ON Users.CityID = Cities.CityID
+
+
+--Adresy osób do wysyłki dyplomów ze studiów
+CREATE VW_UsersDiplomasAddresses AS
+SELECT FirstName, LastName, Street, PostalCode, CityName
+FROM Studies S
+INNER JOIN StudiesResults ON StudiesResults.StudiesID=S.StudiesID
+INNER JOIN Users ON Users.UserID = StudiesResults.StudentID
+INNER JOIN Grades ON StudiesResults.GradeID=Grades.GradeID
+INNER JOIN Cities ON Cities.CityID = Users.CityID
+
+
+--Adresy do wysyłki certyfikatów z kursów
+CREATE VIEW vw_CoursesCertificates AS
+SELECT Users.FirstName, Users.LastName, Street, PostalCode, CityName
+FROM Courses C
+INNER JOIN CourseModules ON CourseModules.CourseID=C.CourseID
+INNER JOIN CourseModulesPassed ON CourseModulesPassed.ModuleID=CourseModules.ModuleID
+INNER JOIN Users ON Users.UserID = CourseModulesPassed.StudentID
+INNER JOIN Cities ON Cities.CityID = Users.CityID
+WHERE (
+	SELECT COUNT(DISTINCT CourseModulesPassed.ModuleID) 
+	FROM CourseModulesPassed 
+	INNER JOIN CourseModules ON CourseModules.ModuleID=CourseModulesPassed.ModuleID
+	INNER JOIN Courses C1 ON C1.CourseID=CourseModules.CourseID
+	WHERE C1.CourseID=C.CourseID AND CourseModulesPassed.StudentID=Users.UserID AND CourseModulesPassed.Passed=1)
+	/
+	(SELECT COUNT(DISTINCT CourseModules.ModuleID) 
+	FROM CourseModules
+	INNER JOIN Courses C1 ON C1.CourseID=CourseModules.CourseID
+	WHERE C1.CourseID=C.CourseID) >= 0.8
+
