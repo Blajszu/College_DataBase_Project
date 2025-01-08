@@ -460,7 +460,7 @@ SELECT MeetingID, 'Spotkanie studyjne ' + STR(MeetingID) AS 'Nazwa spotkania',
         (SELECT COUNT(*) FROM StudyMeetingPayment WHERE PaymentStatus = 'udana' AND StudyMeetingPayment.MeetingID = StudyMeetings.MeetingID)
             +
         (SELECT COUNT(*) FROM OrderDetails WHERE PaymentStatus = 'udana' AND TypeOfActivity = 4 AND ActivityID = StudyMeetings.MeetingID)
-        ) AS 'Liczba ludzi'
+        ) AS 'Liczba uczestników'
 FROM StudyMeetings
 WHERE StartTime > '2025-01-01'
 
