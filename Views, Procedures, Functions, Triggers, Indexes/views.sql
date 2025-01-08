@@ -805,7 +805,7 @@ CREATE VIEW bilocation_report AS
 
 
 CREATE VIEW defferedPayments AS
- SELECT orders.orderid, orders.StudentID, orderdetails.activityid, (select typename FROM FormOfActivity where ActivityTypeID=OrderDetails.TypeOfActivity), DeferredDate
+ SELECT orders.orderid, orders.StudentID, orderdetails.activityid, (select typename FROM FormOfActivity where ActivityTypeID=OrderDetails.TypeOfActivity) AS 'Typ', DeferredDate
  FROM orders 
  INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
  WHERE Orders.PaymentDeferred=1
