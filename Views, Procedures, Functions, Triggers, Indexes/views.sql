@@ -574,7 +574,7 @@ INNER JOIN Users ON Employees.EmployeeID = Users.UserID
 CREATE VIEW VW_CoursesStartDateEndDate AS
 WITH T1 AS (
     SELECT
-        Courses.CourseID AS 'id',
+        Courses.CourseID AS 'ID',
         MIN(OnlineCourseMeeting.StartDate) AS 'online_start_date',
         MIN(StationaryCourseMeeting.StartDate) AS 'stationary_start_date',
         MAX(OnlineCourseMeeting.EndDate) AS 'online_end_date',
