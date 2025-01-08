@@ -722,7 +722,7 @@ FROM Users
          INNER JOIN UsersRoles ON UsersRoles.UserID=Users.UserID
 WHERE UsersRoles.RoleID = (SELECT RoleID FROM Roles WHERE RoleName='Wykładowca')
 
-CREATE VIEW vw_StudentsAttendanceAtSubjects AS
+CREATE VIEW vw_ AS PresenceOnPastStudyMeeting
 WITH t2 AS (
     SELECT 
         sm.MeetingID, 
@@ -757,7 +757,7 @@ SELECT
 FROM 
     t2;
 
-CREATE VIEW vw_PresenceOnPastStudyMeeting AS
+CREATE VIEW vw_StudentsAttendanceAtSubjects AS
 SELECT
     smp.StudentID,
     sm.SubjectID,
@@ -769,3 +769,43 @@ FROM
 GROUP BY
     smp.StudentID,
     sm.SubjectID;
+
+
+CREATE VIEW bilocation_report AS
+ WITH student_meetings AS (
+ SELECT
+ users.userId,
+ orderdetails.ActivityID AS meetingId,
+ StudyMeetings.startTime,
+ StudyMeetings.endTime
+ FROM Users
+ JOIN orders on orders.StudentID=users.UserID
+ JOIN OrderDetails on OrderDetails.OrderID = orders.orderid
+ JOIN StudyMeetings on StudyMeetings.MeetingID=OrderDetails.ActivityID
+ where TypeOfActivity = 3
+ )
+ SELECT
+ student_meetings.userId,
+ student_meetings.meetingid AS first_meeting_id,
+ student_meetings.starttime AS first_meeting_start_time,
+ student_meetings.endtime AS first_meeting_end_time,
+ SM.meetingid AS second_meeting_id,
+ SM.starttime AS second_meeting_start_time,
+ SM.endtime AS second_meeting_end_time
+ FROM student_meetings
+ JOIN orders O ON student_meetings.userid = O.studentid
+ JOIN OrderDetails od on od.orderid=O.orderid
+ JOiN StudyMeetingPayment SMP on SMP.detailid= od.detailid
+ JOIN StudyMeetings SM on SMP.meetingid = SM.meetingid
+ WHERE student_meetings.meetingid < SM.meetingid AND
+ (student_meetings.starttime >= GETDATE() OR SM.startTime >=
+ GETDATE()) AND
+ (student_meetings.endtime >= SM.startTime AND
+ student_meetings.starttime <= SM.endTime)
+
+
+CREATE VIEW defferedPayments AS
+ SELECT orders.orderid, orders.StudentID, orderdetails.activityid, (select typename FROM FormOfActivity where ActivityTypeID=OrderDetails.TypeOfActivity), DeferredDate
+ FROM orders 
+ INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
+ WHERE Orders.PaymentDeferred=1
