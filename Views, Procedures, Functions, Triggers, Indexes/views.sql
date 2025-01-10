@@ -1521,7 +1521,7 @@ INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
 INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
 INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
 WHERE TypeOfActivity=1 AND 
-DATENAME(DAY,StartDate)+' '+DATENAME(MONTH,StartDate)+' '+DATENAME(YEAR,StartDate)+' '+DATENAME(HOUR,StartDate)+':'+DATENAME(MINUTE,StartDate) > GETDATE()
+webinars.startdate > GETDATE()
 
 CREATE VIEW vw_NumberOfHoursOfWOrkForAllEmployees as
 with t1 as (

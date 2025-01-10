@@ -2639,27 +2639,13 @@ BEGIN
     DECLARE @TypeOfActivity INT;
     DECLARE @Price DECIMAL(18,2);
     DECLARE @DetailID INT;
-    DECLARE @StudentLimit INT;
-    DECLARE @TotalBooked INT;
-    DECLARE @EntryFee DECIMAL(18,2);
-    DECLARE @PaymentAdvance DECIMAL(18,2);
     DECLARE @OrderDate DATETIME = GETDATE();
-    DECLARE @PaymentDeferred BIT = NULL;
-    DECLARE @DeferredDate DATETIME = NULL;
     DECLARE @PaymentLink VARCHAR(255) = NULL;
 
-    DECLARE @InvalidActivityType INT;
-    
-    SELECT @InvalidActivityType = COUNT(*)
-    FROM @ActivityList AL
-    LEFT JOIN ActivitiesTypes AT ON AL.TypeOfActivity = AT.ActivityTypeID
-    WHERE AT.ActivityTypeID IS NULL;
+    INSERT INTO Orders (UserID, OrderDate)
+    VALUES (@UserID, @OrderDate);
 
-    IF @InvalidActivityType > 0
-    BEGIN
-        RAISERROR ('Jedna lub więcej typów aktywności nie są poprawne w tabeli ActivitiesTypes.', 16, 1);
-        RETURN;
-    END
+    SET @OrderID = SCOPE_IDENTITY();
 
     DECLARE ActivityCursor CURSOR FOR
     SELECT ActivityID, TypeOfActivity
@@ -2671,131 +2657,59 @@ BEGIN
 
     WHILE @@FETCH_STATUS = 0
     BEGIN
-        IF @TypeOfActivity = 4
-        BEGIN
-            SELECT @StudentLimit = SM.StudentLimit
-            FROM StationaryMeetings SM
-            INNER JOIN StudyMeetings SM2 ON SM.MeetingID = SM2.MeetingID
-            WHERE SM2.ActivityID = @ActivityID;
-
-            SELECT @TotalBooked = COUNT(O.OrderID)
-            FROM Orders O
-            INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
-            WHERE OD.ActivityID = @ActivityID
-            AND OD.TypeOfActivity = @TypeOfActivity;
-
-            IF (@TotalBooked + 1) > @StudentLimit
-            BEGIN
-                RAISERROR ('Przekroczono limit miejsc na spotkaniu stacjonarnym dla aktywności o ID %d.', 16, 1, @ActivityID);
-                CLOSE ActivityCursor;
-                DEALLOCATE ActivityCursor;
-                RETURN;
-            END
-        END
-        IF @TypeOfActivity = 3
-        BEGIN
-            SELECT @StudentLimit =  S.StudentLimit
-            FROM Studies S WHERE S.StudiesID = @ActivityID;
-
-            SELECT @TotalBooked = COUNT(OD.OrderID)
-            FROM OrderDetails OD
-            WHERE OD.ActivityID = @ActivityID
-            AND OD.TypeOfActivity = @TypeOfActivity;
-
-            IF (@TotalBooked + 1) > @StudentLimit
-            BEGIN
-                RAISERROR ('Przekroczono limit miejsc na studiach dla aktywności o ID %d.', 16, 1, @ActivityID);
-                CLOSE ActivityCursor;
-                DEALLOCATE ActivityCursor;
-                RETURN;
-            END
-
-            SELECT @StudentLimit =  MIN(S.StudentLimit
-            FROM StationaryMeetings SM
-            INNER JOIN StudyMeetings SM2 ON SM.MeetingID = SM2.MeetingID
-            INNER JOIN StudyMeetingPayment SMP ON SM2.MeetingID = SMP.MeetingID
-            INNER JOIN OrderDetails OD ON SMP.DetailID = OD.DetailID
-            WHERE ActivityID = @ActivityID)
-
-            SELECT @TotalBooked = COUNT(SM.DetailID)
-            FROM StudyMeetings SM
-            INNER JOIN Subjects S ON SM.SubjectID = S.SubjectID
-            WHERE S.StudiesID = @ActivityID
-
-            IF (@TotalBooked + 1) > @StudentLimit
-            BEGIN
-                RAISERROR ('Przekroczono limit miejsc na spotkaniach studyjnych dla aktywności o ID %d.', 16, 1, @ActivityID);
-                CLOSE ActivityCursor;
-                DEALLOCATE ActivityCursor;
-                RETURN;
-            END
-        END    
-
         IF @TypeOfActivity = 2
-        BEGIN
-            SELECT @StudentLimit =  C.StudentLimit
-            FROM Courses C WHERE C.CourseID = @ActivityID AND @TypeOfActivity = 2;
-
-            SELECT @TotalBooked = COUNT(OD.OrderID)
-            FROM OrderDetails OD
-            WHERE OD.ActivityID = @Activity AND @TypeOfActivity = 2;    
-
-            IF @StudentLimit IS NOT NULL && (@TotalBooked + 1) > @StudentLimit
-            BEGIN
-                RAISERROR ('Przekroczono limit miejsc na kursie dla aktywności o ID %d.', 16, 1, @ActivityID);
-                CLOSE ActivityCursor;
-                DEALLOCATE ActivityCursor;
-                RETURN;
-            END
-
-        IF @TypeOfActivity = 4
-            SELECT @Price = MeetingPriceForOthers FROM StudyMeetings WHERE MeetingID = @ActivityID;
+            SELECT @Price = CoursePrice FROM Courses WHERE CourseID = @ActivityID;
         ELSE IF @TypeOfActivity = 3
             SELECT @Price = EntryFee FROM Studies WHERE StudiesID = @ActivityID;
-        ELSE IF @TypeOfActivity = 2
-            SELECT @Price = CoursePrice FROM Courses WHERE CourseID = @ActivityID;
+        ELSE IF @TypeOfActivity = 4
+            SELECT @Price = MeetingPriceForOthers FROM StudyMeetings WHERE MeetingID = @ActivityID;
         ELSE IF @TypeOfActivity = 1
             SELECT @Price = Price FROM Webinars WHERE WebinarID = @ActivityID;
 
         SET @DetailID = SCOPE_IDENTITY();
-        INSERT INTO OrderDetails (DetailID, OrderID, ActivityID, TypeOfActivity, Price, PaidDate, PaymentStatus)
-        VALUES (@DetailID, @OrderID, @ActivityID, @TypeOfActivity, @Price, NULL, NULL);
+        INSERT INTO OrderDetails (OrderID, ActivityID, TypeOfActivity, Price, PaidDate, PaymentStatus)
+        VALUES (@OrderID, @ActivityID, @TypeOfActivity, @Price, NULL, NULL);
 
         IF @TypeOfActivity = 2
         BEGIN
-            SET @AdvancePrice = @Price * 0.10;
+            DECLARE @AdvancePrice DECIMAL(18,2) = @Price * 0.10;
             INSERT INTO PaymentsAdvances (DetailID, AdvancePrice, AdvancePaidDate, AdvancePaymentStatus)
             VALUES (@DetailID, @AdvancePrice, NULL, NULL);
         END
-        
+
         IF @TypeOfActivity = 3
         BEGIN
+            DECLARE @MeetingID INT;
+            DECLARE @MeetingPrice DECIMAL(18,2);
+
             DECLARE MeetingCursor CURSOR FOR
-            SELECT MeetingID, MeetingPrice FROM StudyMeetings INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID WHERE StudiesID = @ActivityID;
-            
+            SELECT MeetingID, MeetingPrice 
+            FROM StudyMeetings
+            WHERE ActivityID = @ActivityID;
+
             OPEN MeetingCursor;
             FETCH NEXT FROM MeetingCursor INTO @MeetingID, @MeetingPrice;
-            
+
             WHILE @@FETCH_STATUS = 0
             BEGIN
                 INSERT INTO StudyMeetingPayment (DetailID, MeetingID, Price, PaidDate, PaymentStatus)
                 VALUES (@DetailID, @MeetingID, @MeetingPrice, NULL, NULL);
-                
                 FETCH NEXT FROM MeetingCursor INTO @MeetingID, @MeetingPrice;
             END
-            
+
             CLOSE MeetingCursor;
             DEALLOCATE MeetingCursor;
         END
-        
+
         FETCH NEXT FROM ActivityCursor INTO @ActivityID, @TypeOfActivity;
     END
-    
+
     CLOSE ActivityCursor;
     DEALLOCATE ActivityCursor;
-    
+
     COMMIT TRANSACTION;
 END
+
 
 
 CREATE PROCEDURE ModifyOrder
@@ -3100,15 +3014,76 @@ BEGIN
 END;
 
 
-CREATE PROCEDURE DeleteActivityInsteadOfAbsence
-    @StudentID INT,
-    @AbsenceMeetingID INT
+CREATE PROCEDURE EditOrderDetailsPaymentLink
+    @DetailID INT,
+    @NewPaymentLink NVARCHAR(255)
 AS
 BEGIN
-    SET NOCOUNT ON;
+    IF NOT EXISTS (SELECT 1 FROM OrderDetails WHERE DetailID = @DetailID)
+    BEGIN
+        RAISERROR('Rekord z podanym DetailID nie istnieje w tabeli OrderDetails.', 16, 1);
+        RETURN;
+    END;
 
-    DELETE FROM ActivityInsteadOfAbsence
-    WHERE StudentID = @StudentID AND MeetingID = @AbsenceMeetingID;
+    UPDATE OrderDetails
+    SET PaymentLink = @NewPaymentLink
+    WHERE DetailID = @DetailID;
 END;
+
+
+
+
+CREATE PROCEDURE EditOrderDetailsPaymentLink
+    @DetailID INT,
+    @NewPaymentLink NVARCHAR(255)
+AS
+BEGIN
+
+    UPDATE OrderDetails
+    SET PaymentLink = @NewPaymentLink
+    WHERE DetailID = @DetailID;
+END;
+
+
+CREATE PROCEDURE EditStudyMeetingPaymentLink
+    @DetailID INT,
+    @MeetingID INT,
+    @NewPaymentLink NVARCHAR(255)
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 
+                   FROM StudyMeetingPayment
+                   WHERE DetailID = @StudyDetailID 
+                   AND MeetingID = @MeetingID)
+    BEGIN
+        RAISERROR('Rekord z podanym StudyMeetingPaymentID i MeetingID nie istnieje w tabeli StudyMeetingPayments.', 16, 1);
+        RETURN;
+    END;
+
+    UPDATE StudyMeetingPayment
+    SET PaymentLink = @NewPaymentLink
+    WHERE StudyMeetingPaymentID = @StudyMeetingPaymentID
+    AND MeetingID = @MeetingID;
+END;
+
+
+CREATE PROCEDURE EditPaymentsAdvancesPaymentLink
+    @DetailID INT,
+    @NewPaymentLink NVARCHAR(255)
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM PaymentsAdvances WHERE DetailID = @DetailID)
+    BEGIN
+        RAISERROR('Rekord z podanym DetailID nie istnieje w tabeli PaymentAdvances.', 16, 1);
+        RETURN;
+    END;
+
+    UPDATE PaymentsAdvances
+    SET PaymentLink = @NewPaymentLink
+    WHERE DetailID = @DetailID;
+END;
+
+
+
 
 
