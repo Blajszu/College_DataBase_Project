@@ -364,91 +364,60 @@ RETURN
     END
 );
 
-CREATE FUNCTION GetHoursOfWorkOfEmployee
+CREATE FUNCTION dbo.GetNumberOfHoursOfWorkForAllEmployees
 (
-    @StartTime DATETIME,
-    @EndTime DATETIME
+    @StartDate datetime,
+    @EndDate datetime
 )
 RETURNS TABLE
-AS
-RETURN
-(
+    AS
+    RETURN
+    (
     WITH t1 AS (
-        SELECT 
-            EmployeeID, 
-            (ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN sm.StartTime >= @StartTime THEN sm.StartTime 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN sm.EndTime <= @EndTime THEN sm.EndTime 
-                                ELSE @EndTime 
-                             END), 0) +
-             ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN sm1.StartTime >= @StartTime THEN sm1.StartTime 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN sm1.EndTime <= @EndTime THEN sm1.EndTime 
-                                ELSE @EndTime 
-                             END), 0) +
-             ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN w.StartDate >= @StartTime THEN w.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN w.EndDate <= @EndTime THEN w.EndDate 
-                                ELSE @EndTime 
-                             END), 0) +
-             ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN w1.StartDate >= @StartTime THEN w1.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN w1.EndDate <= @EndTime THEN w1.EndDate 
-                                ELSE @EndTime 
-                             END), 0) +
-             ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN ocm.StartDate >= @StartTime THEN ocm.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN ocm.EndDate <= @EndTime THEN ocm.EndDate 
-                                ELSE @EndTime 
-                             END), 0) +
-             ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN ocm1.StartDate >= @StartTime THEN ocm1.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN ocm1.EndDate <= @EndTime THEN ocm1.EndDate 
-                                ELSE @EndTime 
-                             END), 0) +
-             ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN scm.StartDate >= @StartTime THEN scm.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN scm.EndDate <= @EndTime THEN scm.EndDate 
-                                ELSE @EndTime 
-                             END), 0) +
-             ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN scm1.StartDate >= @StartTime THEN scm1.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN scm1.EndDate <= @EndTime THEN scm1.EndDate 
-                                ELSE @EndTime 
-                             END), 0)
-            ) * (-1) AS liczbaminut
+        SELECT
+            EmployeeID,
+            (
+                ISNULL(CASE
+                            WHEN sm.StartTime >= @StartDate AND sm.EndTime <= @EndDate
+                                THEN DATEDIFF(minute, sm.EndTime, sm.StartTime)
+                            ELSE 0
+                            END, 0) +
+                ISNULL(CASE
+                            WHEN sm1.StartTime >= @StartDate AND sm1.EndTime <= @EndDate
+                                THEN DATEDIFF(minute, sm1.EndTime, sm1.StartTime)
+                            ELSE 0
+                            END, 0) +
+                ISNULL(CASE
+                            WHEN w.StartDate >= @StartDate AND w.EndDate <= @EndDate
+                                THEN DATEDIFF(minute, w.EndDate, w.StartDate)
+                            ELSE 0
+                            END, 0) +
+                ISNULL(CASE
+                            WHEN w1.StartDate >= @StartDate AND w1.EndDate <= @EndDate
+                                THEN DATEDIFF(minute, w1.EndDate, w1.StartDate)
+                            ELSE 0
+                            END, 0) +
+                ISNULL(CASE
+                            WHEN ocm.StartDate >= @StartDate AND ocm.EndDate <= @EndDate
+                                THEN DATEDIFF(minute, ocm.EndDate, ocm.StartDate)
+                            ELSE 0
+                            END, 0) +
+                ISNULL(CASE
+                            WHEN ocm1.StartDate >= @StartDate AND ocm1.EndDate <= @EndDate
+                                THEN DATEDIFF(minute, ocm1.EndDate, ocm1.StartDate)
+                            ELSE 0
+                            END, 0) +
+                ISNULL(CASE
+                            WHEN scm.StartDate >= @StartDate AND scm.EndDate <= @EndDate
+                                THEN DATEDIFF(minute, scm.EndDate, scm.StartDate)
+                            ELSE 0
+                            END, 0) +
+                ISNULL(CASE
+                            WHEN scm1.StartDate >= @StartDate AND scm1.EndDate <= @EndDate
+                                THEN DATEDIFF(minute, scm1.EndDate, scm1.StartDate)
+                            ELSE 0
+                            END, 0)
+                ) * (-1) as liczbaminut
         FROM Employees
         LEFT OUTER JOIN StudyMeetings AS sm ON sm.LecturerID = Employees.EmployeeID
         LEFT OUTER JOIN StudyMeetings AS sm1 ON sm1.TranslatorID = Employees.EmployeeID
@@ -461,24 +430,20 @@ RETURN
         LEFT OUTER JOIN StationaryCourseMeeting AS scm ON scm.ModuleID = cm.ModuleID
         LEFT OUTER JOIN StationaryCourseMeeting AS scm1 ON scm1.ModuleID = cm1.ModuleID
 
-        UNION ALL
+    UNION
 
-        SELECT 
-            InternshipCoordinatorID AS EmployeeID, 
-            ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN Internship.StartDate >= @StartTime THEN Internship.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN Internship.EndDate <= @EndTime THEN Internship.EndDate 
-                                ELSE @EndTime 
-                             END), 0) AS liczbaminut
-        FROM Internship
-    )
-    SELECT 
-        EmployeeID, 
-        ROUND(SUM(liczbaminut) / 60.0, 2) AS liczbagodzinpracy
-    FROM t1
-    GROUP BY EmployeeID
-);
+    SELECT
+        internshipCoordinatorID,
+        CASE
+            WHEN i.StartDate >= @StartDate AND i.EndDate <= @EndDate
+                THEN 3000
+            ELSE 0
+            END
+    FROM internship i
+)
+SELECT
+    EmployeeID,
+    ROUND(SUM(liczbaminut)/60.0, 2) as liczbagodzinpracy
+FROM t1
+GROUP BY EmployeeID
+)
