@@ -2373,4 +2373,742 @@ BEGIN
 END
 
 
+CREATE PROCEDURE AddUserRole
+    @UserID INT,
+    @RoleID INT
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @UserID)
+    BEGIN
+        PRINT 'Użytkownik o podanym UserID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Roles WHERE RoleID = @RoleID)
+    BEGIN
+        PRINT 'Rola o podanym RoleID nie istnieje.';
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @UserID AND RoleID = @RoleID)
+    BEGIN
+        PRINT 'Użytkownik już posiada tę rolę.';
+        RETURN;
+    END
+
+    INSERT INTO UsersRoles (UserID, RoleID)
+    VALUES (@UserID, @RoleID);
+    PRINT 'Rola została pomyślnie dodana użytkownikowi.';
+END;
+
+
+CREATE PROCEDURE AddStudyResult
+    @StudentID INT,
+    @StudiesID INT,
+    @GradeID INT
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @StudentID)
+    BEGIN
+        PRINT 'Student o podanym StudentID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Studies WHERE StudiesID = @StudiesID)
+    BEGIN
+        PRINT 'Kierunek studiów o podanym StudiesID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Grades WHERE GradeID = @GradeID)
+    BEGIN
+        PRINT 'Ocena o podanym GradeID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Orders O
+                   INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   WHERE O.UserID = @StudentID AND OD.ActivityID = @StudiesID)
+    BEGIN
+        PRINT 'Student nie złożył zamówienia na te studia.';
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM StudiesResults WHERE StudentID = @StudentID AND StudiesID = @StudiesID)
+    BEGIN
+        PRINT 'Rezultat dla tego studenta i kierunku już istnieje.';
+        RETURN;
+    END
+
+    INSERT INTO StudiesResults (StudentID, StudiesID, GradeID)
+    VALUES (@StudentID, @StudiesID, @GradeID);
+
+    PRINT 'Rezultat studiów został pomyślnie dodany.';
+END;
+
+
+
+CREATE PROCEDURE AddSubjectResult
+    @StudentID INT,
+    @SubjectID INT,
+    @GradeID INT
+
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @StudentID)
+    BEGIN
+        PRINT 'Student o podanym StudentID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Subjects WHERE SubjectID = @SubjectID)
+    BEGIN
+        PRINT 'Przedmiot o podanym SubjectID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Grades WHERE GradeID = @GradeID)
+    BEGIN
+        PRINT 'Ocena o podanym GradeID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Orders O
+                   INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   INNER JOIN Subjects S ON OD.ActivityID = S.StudiesID
+                   WHERE O.UserID = @StudentID AND S.SubjectID = @SubjectID)
+    BEGIN
+        PRINT 'Student nie złożył zamówienia na studia, w ramach którego jest podany przedmiot.';
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM SubjectsResults WHERE StudentID = @StudentID AND SubjectID = @SubjectID)
+    BEGIN
+        PRINT 'Rezultat dla tego studenta i przedmiotu już istnieje.';
+        RETURN;
+    END
+
+    INSERT INTO SubjectsResults (SubjectID, StudentID, GradeID)
+    VALUES (@SubjectID, @StudentID, @GradeID);
+
+    PRINT 'Rezultat przedmiotu został pomyślnie dodany.';
+END;
+
+
+CREATE PROCEDURE AddInternshipResult
+    @StudentID INT,
+    @InternshipID INT,
+    @GradeID INT
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @StudentID)
+    BEGIN
+        PRINT 'Student o podanym StudentID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Internship WHERE InternshipID = @InternshipID)
+    BEGIN
+        PRINT 'Praktyka o podanym InternshipID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Grades WHERE GradeID = @GradeID)
+    BEGIN
+        PRINT 'Ocena o podanym GradeID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Orders O
+                   INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   INNER JOIN Internship I ON OD.ActivityID = I.StudiesID
+                   WHERE O.UserID = @StudentID AND I.InternshipID = @InternshipID)
+    BEGIN
+        PRINT 'Student nie złożył zamówienia na studia, w ramach których odbywają się praktyki.';
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM InternshipPassed WHERE StudentID = @StudentID AND InternshipID = @InternshipID)
+    BEGIN
+        PRINT 'Rezultat praktyk dla tego studenta już istnieje.';
+        RETURN;
+    END
+
+    INSERT INTO InternshipPassed (InternshipID, StudentID, GradeID)
+    VALUES (@InternshipID, @StudentID, @GradeID);
+
+    PRINT 'Rezultat praktyk został pomyślnie dodany.';
+END;
+
+
+CREATE PROCEDURE AddStudyMeetingPresence
+    @StudentID INT,
+    @MeetingID INT,
+    @PresenceStatus BIT
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @StudentID)
+    BEGIN
+        PRINT 'Student o podanym StudentID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM StudyMeetings WHERE MeetingID = @MeetingID)
+    BEGIN
+        PRINT 'Spotkanie o podanym MeetingID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Orders O
+                   INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   WHERE O.UserID = @StudentID AND OD.ActivityID = @MeetingID 
+                   UNION 
+                   SELECT 1 FROM Orders O
+                   INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   INNER JOIN StudyMeetingPayment SMP ON OD.DetailID = SMP.DetailID
+                   WHERE O.UserID = @StudentID AND SMP.MeetingID = @MeetingID)
+    BEGIN
+        PRINT 'Student nie wykupił tego spotkania.';
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM StudyMeetingPresence WHERE StudyMeetingID = @MeetingID AND StudentID = @StudentID)
+    BEGIN
+        PRINT 'Obecność na to spotkanie dla tego studenta już istnieje.';
+        RETURN;
+    END
+
+    INSERT INTO StudyMeetingPresence (StudyMeetingID, StudentID, PresenceStatus)
+    VALUES (@MeetingID, @StudentID, @PresenceStatus);
+
+    PRINT 'Obecność została pomyślnie dodana.';
+END;
+
+
+CREATE PROCEDURE AddActivityInsteadOfPresence
+    @StudentID INT,
+    @MeetingID INT,
+    @ActivityID INT,
+    @TypeOfActivity INT
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @StudentID)
+    BEGIN
+        PRINT 'Student o podanym StudentID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM StudyMeetings WHERE MeetingID = @MeetingID)
+    BEGIN
+        PRINT 'Spotkanie o podanym MeetingID nie istnieje.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM StudyMeetingPresence WHERE StudentID = @StudentID AND StudyMeetingID = @MeetingID AND PresenceStatus = 0)
+    BEGIN
+        PRINT 'Student nie ma nieobecności na to spotkanie.';
+        RETURN;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM StudyMeetings WHERE MeetingID = @ActivityID)
+    BEGIN
+        PRINT 'Odrabiana aktywność o podanym ActivityID nie istnieje.';
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM ActivityInsteadOfAbsence WHERE MeetingID = @MeetingID AND StudentID = @StudentID AND ActivityID = @ActivityID)
+    BEGIN
+        PRINT 'Odrabianie dla tego spotkania i studenta zostało już dodane.';
+        RETURN;
+    END
+
+    INSERT INTO ActivityInsteadOfAbsence (MeetingID, StudentID, ActivityID, TypeOfActivity)
+    VALUES (@MeetingID, @StudentID, @ActivityID, @TypeOfActivity);
+
+    PRINT 'Odrabianie zostało pomyślnie dodane.';
+END;
+
+
+CREATE PROCEDURE AddOrderWithDetails
+    @UserID INT,
+    @ActivityList ActivityListType READONLY 
+AS
+BEGIN
+    DECLARE @OrderID INT;
+    DECLARE @ActivityID INT;
+    DECLARE @TypeOfActivity INT;
+    DECLARE @Price DECIMAL(18,2);
+    DECLARE @DetailID INT;
+    DECLARE @StudentLimit INT;
+    DECLARE @TotalBooked INT;
+    DECLARE @EntryFee DECIMAL(18,2);
+    DECLARE @PaymentAdvance DECIMAL(18,2);
+    DECLARE @OrderDate DATETIME = GETDATE();
+    DECLARE @PaymentDeferred BIT = NULL;
+    DECLARE @DeferredDate DATETIME = NULL;
+    DECLARE @PaymentLink VARCHAR(255) = NULL;
+
+    DECLARE @InvalidActivityType INT;
+    
+    SELECT @InvalidActivityType = COUNT(*)
+    FROM @ActivityList AL
+    LEFT JOIN ActivitiesTypes AT ON AL.TypeOfActivity = AT.ActivityTypeID
+    WHERE AT.ActivityTypeID IS NULL;
+
+    IF @InvalidActivityType > 0
+    BEGIN
+        RAISERROR ('Jedna lub więcej typów aktywności nie są poprawne w tabeli ActivitiesTypes.', 16, 1);
+        RETURN;
+    END
+
+    DECLARE ActivityCursor CURSOR FOR
+    SELECT ActivityID, TypeOfActivity
+    FROM @ActivityList;
+
+    OPEN ActivityCursor;
+
+    FETCH NEXT FROM ActivityCursor INTO @ActivityID, @TypeOfActivity;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        IF @TypeOfActivity = 4
+        BEGIN
+            SELECT @StudentLimit = SM.StudentLimit
+            FROM StationaryMeetings SM
+            INNER JOIN StudyMeetings SM2 ON SM.MeetingID = SM2.MeetingID
+            WHERE SM2.ActivityID = @ActivityID;
+
+            SELECT @TotalBooked = COUNT(O.OrderID)
+            FROM Orders O
+            INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+            WHERE OD.ActivityID = @ActivityID
+            AND OD.TypeOfActivity = @TypeOfActivity;
+
+            IF (@TotalBooked + 1) > @StudentLimit
+            BEGIN
+                RAISERROR ('Przekroczono limit miejsc na spotkaniu stacjonarnym dla aktywności o ID %d.', 16, 1, @ActivityID);
+                CLOSE ActivityCursor;
+                DEALLOCATE ActivityCursor;
+                RETURN;
+            END
+        END
+        IF @TypeOfActivity = 3
+        BEGIN
+            SELECT @StudentLimit =  S.StudentLimit
+            FROM Studies S WHERE S.StudiesID = @ActivityID;
+
+            SELECT @TotalBooked = COUNT(OD.OrderID)
+            FROM OrderDetails OD
+            WHERE OD.ActivityID = @ActivityID
+            AND OD.TypeOfActivity = @TypeOfActivity;
+
+            IF (@TotalBooked + 1) > @StudentLimit
+            BEGIN
+                RAISERROR ('Przekroczono limit miejsc na studiach dla aktywności o ID %d.', 16, 1, @ActivityID);
+                CLOSE ActivityCursor;
+                DEALLOCATE ActivityCursor;
+                RETURN;
+            END
+
+            SELECT @StudentLimit =  MIN(S.StudentLimit
+            FROM StationaryMeetings SM
+            INNER JOIN StudyMeetings SM2 ON SM.MeetingID = SM2.MeetingID
+            INNER JOIN StudyMeetingPayment SMP ON SM2.MeetingID = SMP.MeetingID
+            INNER JOIN OrderDetails OD ON SMP.DetailID = OD.DetailID
+            WHERE ActivityID = @ActivityID)
+
+            SELECT @TotalBooked = COUNT(SM.DetailID)
+            FROM StudyMeetings SM
+            INNER JOIN Subjects S ON SM.SubjectID = S.SubjectID
+            WHERE S.StudiesID = @ActivityID
+
+            IF (@TotalBooked + 1) > @StudentLimit
+            BEGIN
+                RAISERROR ('Przekroczono limit miejsc na spotkaniach studyjnych dla aktywności o ID %d.', 16, 1, @ActivityID);
+                CLOSE ActivityCursor;
+                DEALLOCATE ActivityCursor;
+                RETURN;
+            END
+        END    
+
+        IF @TypeOfActivity = 2
+        BEGIN
+            SELECT @StudentLimit =  C.StudentLimit
+            FROM Courses C WHERE C.CourseID = @ActivityID AND @TypeOfActivity = 2;
+
+            SELECT @TotalBooked = COUNT(OD.OrderID)
+            FROM OrderDetails OD
+            WHERE OD.ActivityID = @Activity AND @TypeOfActivity = 2;    
+
+            IF @StudentLimit IS NOT NULL && (@TotalBooked + 1) > @StudentLimit
+            BEGIN
+                RAISERROR ('Przekroczono limit miejsc na kursie dla aktywności o ID %d.', 16, 1, @ActivityID);
+                CLOSE ActivityCursor;
+                DEALLOCATE ActivityCursor;
+                RETURN;
+            END
+
+        IF @TypeOfActivity = 4
+            SELECT @Price = MeetingPriceForOthers FROM StudyMeetings WHERE MeetingID = @ActivityID;
+        ELSE IF @TypeOfActivity = 3
+            SELECT @Price = EntryFee FROM Studies WHERE StudiesID = @ActivityID;
+        ELSE IF @TypeOfActivity = 2
+            SELECT @Price = CoursePrice FROM Courses WHERE CourseID = @ActivityID;
+        ELSE IF @TypeOfActivity = 1
+            SELECT @Price = Price FROM Webinars WHERE WebinarID = @ActivityID;
+
+        SET @DetailID = SCOPE_IDENTITY();
+        INSERT INTO OrderDetails (DetailID, OrderID, ActivityID, TypeOfActivity, Price, PaidDate, PaymentStatus)
+        VALUES (@DetailID, @OrderID, @ActivityID, @TypeOfActivity, @Price, NULL, NULL);
+
+        IF @TypeOfActivity = 2
+        BEGIN
+            SET @AdvancePrice = @Price * 0.10;
+            INSERT INTO PaymentsAdvances (DetailID, AdvancePrice, AdvancePaidDate, AdvancePaymentStatus)
+            VALUES (@DetailID, @AdvancePrice, NULL, NULL);
+        END
+        
+        IF @TypeOfActivity = 3
+        BEGIN
+            DECLARE MeetingCursor CURSOR FOR
+            SELECT MeetingID, MeetingPrice FROM StudyMeetings INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID WHERE StudiesID = @ActivityID;
+            
+            OPEN MeetingCursor;
+            FETCH NEXT FROM MeetingCursor INTO @MeetingID, @MeetingPrice;
+            
+            WHILE @@FETCH_STATUS = 0
+            BEGIN
+                INSERT INTO StudyMeetingPayment (DetailID, MeetingID, Price, PaidDate, PaymentStatus)
+                VALUES (@DetailID, @MeetingID, @MeetingPrice, NULL, NULL);
+                
+                FETCH NEXT FROM MeetingCursor INTO @MeetingID, @MeetingPrice;
+            END
+            
+            CLOSE MeetingCursor;
+            DEALLOCATE MeetingCursor;
+        END
+        
+        FETCH NEXT FROM ActivityCursor INTO @ActivityID, @TypeOfActivity;
+    END
+    
+    CLOSE ActivityCursor;
+    DEALLOCATE ActivityCursor;
+    
+    COMMIT TRANSACTION;
+END
+
+
+CREATE PROCEDURE ModifyOrder
+    @OrderID INT,
+    @NewUserID INT = NULL,
+    @PaymentDeferred BIT = NULL,
+    @DeferredDate DATETIME = NULL,
+    @PaymentLink VARCHAR(255) = NULL 
+AS
+BEGIN
+    BEGIN TRANSACTION;
+
+    UPDATE Orders
+    SET UserID = ISNULL(@NewUserID, UserID),
+        PaymentDeferred = ISNULL(@PaymentDeferred, PaymentDeferred),
+        DeferredDate = ISNULL(@DeferredDate, DeferredDate),
+        PaymentLink = ISNULL(@PaymentLink, PaymentLink)
+    WHERE OrderID = @OrderID;
+
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR ('Zamówienie o podanym ID nie istnieje.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
+
+    COMMIT TRANSACTION;
+END;
+
+CREATE PROCEDURE DeleteOrder
+    @OrderID INT
+AS
+BEGIN
+    BEGIN TRANSACTION;
+
+    DELETE FROM OrderDetails
+    WHERE OrderID = @OrderID;
+
+    DELETE FROM Orders
+    WHERE OrderID = @OrderID;
+
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR ('Zamówienie o podanym ID nie istnieje.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
+
+    COMMIT TRANSACTION;
+END;
+
+CREATE PROCEDURE ModifyOrderDetail
+    @DetailID INT,
+    @NewActivityID INT = NULL,
+    @NewTypeOfActivity INT = NULL,
+    @NewPrice DECIMAL(18,2) = NULL, 
+    @NewPaymentStatus BIT = NULL 
+AS
+BEGIN
+    BEGIN TRANSACTION;
+
+    DECLARE @PaidStatus BIT;
+    SELECT @PaidStatus = PaymentStatus
+    FROM OrderDetails
+    WHERE DetailID = @DetailID;
+
+    IF @PaidStatus = 1
+    BEGIN
+        RAISERROR ('Nie można zmodyfikować aktywności, która została opłacona. Usuń ją i dodaj nową.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
+
+    UPDATE OrderDetails
+    SET ActivityID = ISNULL(@NewActivityID, ActivityID),
+        TypeOfActivity = ISNULL(@NewTypeOfActivity, TypeOfActivity),
+        Price = ISNULL(@NewPrice, Price),
+        PaymentStatus = ISNULL(@NewPaymentStatus, PaymentStatus)
+    WHERE DetailID = @DetailID;
+
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR ('Szczegóły zamówienia o podanym ID nie istnieją.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
+
+    COMMIT TRANSACTION;
+END;
+
+CREATE PROCEDURE DeleteOrderDetail
+    @DetailID INT
+AS
+BEGIN
+    BEGIN TRANSACTION;
+
+    DELETE FROM OrderDetails
+    WHERE DetailID = @DetailID;
+
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR ('Szczegóły zamówienia o podanym ID nie istnieją.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
+
+    COMMIT TRANSACTION;
+END;
+
+
+CREATE PROCEDURE ModifyUserRole
+    @UserID INT,
+    @NewRoleID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @UserID)
+    BEGIN
+        UPDATE UsersRoles
+        SET RoleID = @NewRoleID
+        WHERE UserID = @UserID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO UsersRoles (UserID, RoleID)
+        VALUES (@UserID, @NewRoleID);
+    END
+END;
+GO
+
+CREATE PROCEDURE DeleteUserRole
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DELETE FROM UsersRoles WHERE UserID = @UserID;
+END;
+GO
+
+
+CREATE PROCEDURE ModifyStudiesResult
+    @StudentID INT,
+    @StudiesID INT,
+    @GradeID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM StudiesResults WHERE StudentID = @StudentID AND StudiesID = @StudiesID)
+    BEGIN
+        UPDATE StudiesResults
+        SET GradeID = @GradeID
+        WHERE StudentID = @StudentID AND StudiesID = @StudiesID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO StudiesResults (StudentID, StudiesID, GradeID)
+        VALUES (@StudentID, @StudiesID, @GradeID);
+    END
+END;
+
+
+CREATE PROCEDURE DeleteStudiesResult
+    @StudentID INT,
+    @StudiesID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM StudiesResults
+    WHERE StudentID = @StudentID AND StudiesID = @StudiesID;
+END;
+
+
+CREATE PROCEDURE ModifySubjectResult
+    @StudentID INT,
+    @SubjectID INT,
+    @GradeID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM SubjectsResults WHERE StudentID = @StudentID AND SubjectID = @SubjectID)
+    BEGIN
+        UPDATE SubjectsResults
+        SET GradeID = @GradeID
+        WHERE StudentID = @StudentID AND SubjectID = @SubjectID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO SubjectsResults (StudentID, SubjectID, GradeID)
+        VALUES (@StudentID, @SubjectID, @GradeID);
+    END
+END;
+
+CREATE PROCEDURE DeleteSubjectResult
+    @StudentID INT,
+    @SubjectID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM SubjectsResults
+    WHERE StudentID = @StudentID AND SubjectID = @SubjectID;
+END;
+
+
+CREATE PROCEDURE ModifyInternshipResult
+    @StudentID INT,
+    @InternshipID INT,
+    @Passed BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM InternshipPassed WHERE StudentID = @StudentID AND InternshipID = @InternshipID)
+    BEGIN
+        UPDATE InternshipPassed
+        SET Passed = @Passed
+        WHERE StudentID = @StudentID AND InternshipID = @InternshipID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO InternshipPassed (StudentID, InternshipID, Passed)
+        VALUES (@StudentID, @InternshipID, @Passed);
+    END
+END;
+
+
+CREATE PROCEDURE DeleteInternshipResult
+    @StudentID INT,
+    @InternshipID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM InternshipPassed
+    WHERE StudentID = @StudentID AND InternshipID = @InternshipID;
+END;
+
+
+CREATE PROCEDURE ModifyStudyMeetingPresence
+    @StudentID INT,
+    @MeetingID INT,
+    @Present BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM StudyMeetingsPresence WHERE StudentID = @StudentID AND MeetingID = @MeetingID)
+    BEGIN
+        UPDATE StudyMeetingsPresence
+        SET Present = @Present
+        WHERE StudentID = @StudentID AND MeetingID = @MeetingID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO StudyMeetingsPresence (StudentID, MeetingID, Present)
+        VALUES (@StudentID, @MeetingID, @Present);
+    END
+END;
+
+
+CREATE PROCEDURE DeleteStudyMeetingPresence
+    @StudentID INT,
+    @MeetingID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM StudyMeetingsPresence
+    WHERE StudentID = @StudentID AND MeetingID = @MeetingID;
+END;
+
+
+CREATE PROCEDURE ModifyActivityInsteadOfAbsence
+    @StudentID INT,
+    @AbsenceMeetingID INT,
+    @ReplacementActivityID INT
+    @TypeOfActivity INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF NOT EXISTS (SELECT 1 FROM ActivitiesTypes WHERE ActivityTypeID = @TypeOfActivity)
+    BEGIN
+        RAISERROR('Nieprawidłowy typ aktywności.', 16, 1);
+        RETURN;
+    END
+    IF EXISTS (SELECT 1 FROM ActivityInsteadOfAbsence WHERE StudentID = @StudentID AND MeetingID = @AbsenceMeetingID)
+    BEGIN
+        UPDATE ActivityInsteadOfAbsence
+        SET ActivityID = @ReplacementActivityID
+        WHERE StudentID = @StudentID AND MeetingID = @AbsenceMeetingID;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO ActivityInsteadOfAbsence (StudentID, MeetingID, ActivityID, TypeOfActivity)
+        VALUES (@StudentID, @AbsenceMeetingID, @ReplacementActivityID, @TypeOfActivity);
+    END
+END;
+
+
+CREATE PROCEDURE DeleteActivityInsteadOfAbsence
+    @StudentID INT,
+    @AbsenceMeetingID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM ActivityInsteadOfAbsence
+    WHERE StudentID = @StudentID AND MeetingID = @AbsenceMeetingID;
+END;
+
 

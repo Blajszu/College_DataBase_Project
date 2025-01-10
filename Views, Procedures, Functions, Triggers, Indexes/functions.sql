@@ -116,3 +116,95 @@ RETURN
     WHERE 
         OD.OrderID = @OrderID
 );
+
+
+CREATE PROCEDURE CheckStudentPresenceOrActivity
+    @StudentID INT,
+    @MeetingID INT
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM StudyMeetingPresence 
+               WHERE StudentID = @StudentID 
+               AND StudyMeetingID = @MeetingID
+               AND Presence = 1)
+    BEGIN
+        SELECT 'Student był obecny na tym spotkaniu.' AS Presence;
+    END
+    ELSE
+    BEGIN
+        IF EXISTS (SELECT 1 FROM ActivityInsteadOfAbsence 
+                   WHERE StudentID = @StudentID 
+                   AND MeetingID = @MeetingID)
+        BEGIN
+            SELECT 'Student odrobił to spotkanie inną aktywnością.' AS Presence;
+        END
+        ELSE
+        BEGIN
+            SELECT 'Student nie był obecny na tym spotkaniu ani nie odrobił go inną aktywnością.' AS Presence;
+        END
+    END
+END;
+
+
+CREATE PROCEDURE GetRemainingSeats
+    @ActivityID INT,
+    @TypeOfActivity INT,
+    @RemainingSeats INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF @TypeOfActivity = 1
+    BEGIN
+        SET @RemainingSeats = 2147483647;
+        SELECT @RemainingSeats;
+    END
+
+    IF @TypeOfActivity = 2
+    BEGIN
+        SELECT @RemainingSeats = c.StudentLimit - 
+            ISNULL(COUNT(od.OrderID), 0)
+        FROM Courses c
+        INNER JOIN OrderDetails od ON od.ActivityID = c.CourseID AND od.TypeOfActivity = 2
+        WHERE c.CourseID = @ActivityID;
+
+        IF @RemainingSeats IS NULL OR @RemainingSeats < 0
+            SET @RemainingSeats = 2147483647;
+        SELECT @RemainingSeats;
+    END
+
+    IF @TypeOfActivity = 3
+    BEGIN
+        @RemainingSeats = SELECT s.StudentLimit - 
+            ISNULL(COUNT(SMP.DetailID), 0)
+        FROM Studies s
+        INNER JOIN Subjects ss ON ss.StudiesID = s.StudiesID
+        INNER JOIN StudyMeetings SM ON SM.SubjectID = ss.SubjectID
+        INNER JOIN StudyMeetingPayments SMP ON SMP.MeetingID = SM.MeetingID
+        WHERE s.StudiesID = @ActivityID;
+
+        IF @RemainingSeats IS NULL OR @RemainingSeats < 0
+            SET @RemainingSeats = 2147483647;
+        SELECT @RemainingSeats;
+    END
+
+    IF @TypeOfActivity = 4
+    BEGIN
+        SELECT @RemainingSeats = sm.StudentLimit - 
+            ISNULL(COUNT(smp.StudentID), 0)
+        FROM StationaryMeetings sm
+        INNER JOIN StudyMeetings smt ON smt.MeetingID = sm.MeetingID
+        INNER JOIN StudyMeetingPayments smp ON smp.MeetingID = sm.MeetingID
+        WHERE sm.MeetingID = @ActivityID;
+
+        IF @RemainingSeats IS NULL OR @RemainingSeats < 0
+            SET @RemainingSeats = 2147483647;
+        SELECT @RemainingSeats;
+    END
+    ELSE
+    SET @RemainingSeats = -1;
+    SELECT @RemainingSeats;
+END;
+GO
+
+
