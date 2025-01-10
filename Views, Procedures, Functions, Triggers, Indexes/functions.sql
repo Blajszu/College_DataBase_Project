@@ -364,8 +364,121 @@ RETURN
     END
 );
 
+CREATE FUNCTION GetHoursOfWorkOfEmployee
+(
+    @StartTime DATETIME,
+    @EndTime DATETIME
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    WITH t1 AS (
+        SELECT 
+            EmployeeID, 
+            (ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN sm.StartTime >= @StartTime THEN sm.StartTime 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN sm.EndTime <= @EndTime THEN sm.EndTime 
+                                ELSE @EndTime 
+                             END), 0) +
+             ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN sm1.StartTime >= @StartTime THEN sm1.StartTime 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN sm1.EndTime <= @EndTime THEN sm1.EndTime 
+                                ELSE @EndTime 
+                             END), 0) +
+             ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN w.StartDate >= @StartTime THEN w.StartDate 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN w.EndDate <= @EndTime THEN w.EndDate 
+                                ELSE @EndTime 
+                             END), 0) +
+             ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN w1.StartDate >= @StartTime THEN w1.StartDate 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN w1.EndDate <= @EndTime THEN w1.EndDate 
+                                ELSE @EndTime 
+                             END), 0) +
+             ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN ocm.StartDate >= @StartTime THEN ocm.StartDate 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN ocm.EndDate <= @EndTime THEN ocm.EndDate 
+                                ELSE @EndTime 
+                             END), 0) +
+             ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN ocm1.StartDate >= @StartTime THEN ocm1.StartDate 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN ocm1.EndDate <= @EndTime THEN ocm1.EndDate 
+                                ELSE @EndTime 
+                             END), 0) +
+             ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN scm.StartDate >= @StartTime THEN scm.StartDate 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN scm.EndDate <= @EndTime THEN scm.EndDate 
+                                ELSE @EndTime 
+                             END), 0) +
+             ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN scm1.StartDate >= @StartTime THEN scm1.StartDate 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN scm1.EndDate <= @EndTime THEN scm1.EndDate 
+                                ELSE @EndTime 
+                             END), 0)
+            ) * (-1) AS liczbaminut
+        FROM Employees
+        LEFT OUTER JOIN StudyMeetings AS sm ON sm.LecturerID = Employees.EmployeeID
+        LEFT OUTER JOIN StudyMeetings AS sm1 ON sm1.TranslatorID = Employees.EmployeeID
+        LEFT OUTER JOIN Webinars AS w ON w.TeacherID = Employees.EmployeeID
+        LEFT OUTER JOIN Webinars AS w1 ON w1.TranslatorID = Employees.EmployeeID
+        LEFT OUTER JOIN CourseModules AS cm ON cm.LecturerID = Employees.EmployeeID
+        LEFT OUTER JOIN CourseModules AS cm1 ON cm1.TranslatorID = Employees.EmployeeID
+        LEFT OUTER JOIN OnlineCourseMeeting AS ocm ON ocm.ModuleID = cm.ModuleID
+        LEFT OUTER JOIN OnlineCourseMeeting AS ocm1 ON ocm1.ModuleID = cm1.ModuleID
+        LEFT OUTER JOIN StationaryCourseMeeting AS scm ON scm.ModuleID = cm.ModuleID
+        LEFT OUTER JOIN StationaryCourseMeeting AS scm1 ON scm1.ModuleID = cm1.ModuleID
 
+        UNION ALL
 
-
-
-
+        SELECT 
+            InternshipCoordinatorID AS EmployeeID, 
+            ISNULL(DATEDIFF(minute, 
+                             CASE 
+                                WHEN Internship.StartDate >= @StartTime THEN Internship.StartDate 
+                                ELSE @StartTime 
+                             END,
+                             CASE 
+                                WHEN Internship.EndDate <= @EndTime THEN Internship.EndDate 
+                                ELSE @EndTime 
+                             END), 0) AS liczbaminut
+        FROM Internship
+    )
+    SELECT 
+        EmployeeID, 
+        ROUND(SUM(liczbaminut) / 60.0, 2) AS liczbagodzinpracy
+    FROM t1
+    GROUP BY EmployeeID
+);
