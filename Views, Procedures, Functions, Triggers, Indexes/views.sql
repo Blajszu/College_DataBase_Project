@@ -1454,7 +1454,7 @@ INNER JOIN t1 ON t1.studiesID=S2.StudiesID
 GROUP BY S2.StudiesID, t1.startDate
 
 
-CREATE VIEW VW_allActivities AS
+CREATE VIEW VW_allOrderedActivities AS
 SELECT ActivityID, 
 (SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
 Studies.StudyName as ActivityName, 
@@ -1487,41 +1487,6 @@ INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
 INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
 WHERE TypeOfActivity=1
 
-
-CREATE VIEW VW_allFutureActivities AS
-SELECT ActivityID, 
-(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
-Studies.StudyName as ActivityName, 
-vw.StartDate, vw.EndDate
-FROM Orders 
-INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
-INNER JOIN VW_StudiesStartDateEndDate vw ON vw.studiesid=OrderDetails.ActivityID
-INNER JOIN Studies ON Studies.StudiesID=OrderDetails.ActivityID
-WHERE TypeOfActivity=3 AND StartDate>GETDATE()
-UNION
-SELECT ActivityID, 
-(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
-Courses.CourseName as ActivityName,
-DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH, vw.[Data rozpoczęcia])+' '+ DATENAME(YEAR, vw.[Data rozpoczęcia]) as StartDate, 
-DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH,vw.[Data zakończenia]) + ' ' +DATENAME(YEAR,vw.[Data zakończenia]) as EndDate
-FROM Orders 
-INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
-INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
-INNER JOIN Courses ON Courses.CourseID=OrderDetails.ActivityID
-WHERE TypeOfActivity=2 AND 
-DATENAME(DAY, vw.[Data rozpoczęcia])+' '+DATENAME(MONTH, vw.[Data rozpoczęcia])+' '+ DATENAME(YEAR, vw.[Data rozpoczęcia]) >GETDATE()
-UNION
-SELECT ActivityID, 
-(SELECT typename FROM ActivitiesTypes WHERE ActivitiesTypes.ActivityTypeID=OrderDetails.TypeOfActivity) as ActivityType,
-Webinars.WebinarName as ActivityName,
-DATENAME(DAY,StartDate)+' '+DATENAME(MONTH,StartDate)+' '+DATENAME(YEAR,StartDate)+' '+DATENAME(HOUR,StartDate)+':'+DATENAME(MINUTE,StartDate),
-DATENAME(DAY,EndDate)+' '+DATENAME(MONTH,EndDate)+' '+DATENAME(YEAR,EndDate)+' '+DATENAME(HOUR,EndDate)+':'+DATENAME(MINUTE,EndDate)
-FROM Orders 
-INNER JOIN OrderDetails ON OrderDetails.OrderID=Orders.OrderID
-INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
-INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
-WHERE TypeOfActivity=1 AND 
-webinars.startdate > GETDATE()
 
 CREATE VIEW vw_NumberOfHoursOfWOrkForAllEmployees as
 with t1 as (
