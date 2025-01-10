@@ -299,6 +299,7 @@ CREATE TABLE Users (
     Email varchar(40)  NOT NULL,
     Phone varchar(40)  NOT NULL,
     DateOfBirth date  NOT NULL,
+    Active BIT NOT NULL DEFAULT 1,
     CONSTRAINT Users_pk PRIMARY KEY  (UserID)
 );
 
