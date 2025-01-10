@@ -1,4 +1,4 @@
-CREATE PROCEDURE AddNewStudy
+ENDCREATE PROCEDURE AddNewStudy
     @StudyName NVARCHAR(255),
     @StudiesCoordinatorID INT,
     @StudyPrice DECIMAL(10, 2),
@@ -126,7 +126,6 @@ BEGIN
         BEGIN
             THROW 67007, 'Language not available.', 1; 
         END
-
         
         IF @TranslatorID IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Employees WHERE EmployeeID = @TranslatorID)
         BEGIN
@@ -379,13 +378,12 @@ BEGIN
             
             INSERT INTO OnlineCourseMeeting (ModuleID, StartDate, EndDate, StudentLimit)
             VALUES (@ModuleID, @StartDate, @EndDate, @StudentLimit);
-        END
+        END;
         ELSE
         BEGIN
-            
             THROW 50006, 'Nieprawidłowy typ spotkania. Użyj "Stationary" lub "Online".', 1;
-        END;
-
+        END
+        
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
@@ -395,6 +393,226 @@ BEGIN
     END CATCH
 END;
 
+
+CREATE PROCEDURE AddLanguage
+    @LanguageName NVARCHAR(100)
+AS
+BEGIN
+    BEGIN TRY
+        
+        IF EXISTS (SELECT 1 FROM Languages WHERE LanguageName = @LanguageName)
+        BEGIN
+            PRINT 'Błąd: Język o podanej nazwie już istnieje.';
+            RETURN;
+        END
+
+        
+        INSERT INTO Languages (LanguageName)
+        VALUES (@LanguageName);
+
+        PRINT 'Język został pomyślnie dodany.';
+    END TRY
+    BEGIN CATCH
+        PRINT 'Wystąpił błąd podczas dodawania języka: ' + ERROR_MESSAGE();
+    END CATCH
+END;
+
+
+
+CREATE PROCEDURE UpdateLanguage
+    @LanguageID INT,
+    @NewLanguageName NVARCHAR(100)
+AS
+BEGIN
+    BEGIN TRY
+        
+        IF NOT EXISTS (SELECT 1 FROM Languages WHERE LanguageID = @LanguageID)
+        BEGIN
+            PRINT 'Błąd: Język o podanym ID nie istnieje.';
+            RETURN;
+        END
+
+        
+        IF EXISTS (SELECT 1 FROM Languages WHERE LanguageName = @NewLanguageName)
+        BEGIN
+            PRINT 'Błąd: Język o podanej nowej nazwie już istnieje.';
+            RETURN;
+        END
+
+        
+        UPDATE Languages
+        SET LanguageName = @NewLanguageName
+        WHERE LanguageID = @LanguageID;
+
+        PRINT 'Nazwa języka została pomyślnie zaktualizowana.';
+    END TRY
+    BEGIN CATCH
+        PRINT 'Wystąpił błąd podczas aktualizacji języka: ' + ERROR_MESSAGE();
+    END CATCH
+END;
+
+
+CREATE PROCEDURE DeleteLanguageFromTranslatedLanguage
+    @LanguageID INT
+AS
+BEGIN
+    
+    IF EXISTS (SELECT 1 FROM Languages WHERE LanguageID = @LanguageID)
+    BEGIN
+        
+        DELETE FROM TranslatedLanguage
+        WHERE LanguageID = @LanguageID;
+
+        PRINT 'Rekordy w tabeli TranslatedLanguage zostały usunięte, ale język pozostaje w tabeli Languages.';
+    END
+    ELSE
+    BEGIN
+        
+        PRINT 'Nie znaleziono języka o podanym LanguageID.';
+    END
+END;
+
+
+
+
+
+CREATE PROCEDURE AddCountry
+    @CountryName NVARCHAR(100)
+AS
+BEGIN
+    BEGIN TRY
+        
+        IF EXISTS (SELECT 1 FROM Countries WHERE CountryName = @CountryName)
+        BEGIN
+            PRINT 'Błąd: Kraj o podanej nazwie już istnieje.';
+            RETURN;
+        END
+
+        
+        INSERT INTO Countries (CountryName)
+        VALUES (@CountryName);
+
+        PRINT 'Kraj został pomyślnie dodany.';
+    END TRY
+    BEGIN CATCH
+        PRINT 'Wystąpił błąd podczas dodawania kraju: ' + ERROR_MESSAGE();
+    END CATCH
+END;
+
+
+
+CREATE PROCEDURE UpdateCountry
+    @CountryID INT,
+    @NewCountryName NVARCHAR(100)
+AS
+BEGIN
+    BEGIN TRY
+        
+        IF NOT EXISTS (SELECT 1 FROM Countries WHERE CountryID = @CountryID)
+        BEGIN
+            PRINT 'Błąd: Kraj o podanym ID nie istnieje.';
+            RETURN;
+        END
+
+        
+        IF EXISTS (SELECT 1 FROM Countries WHERE CountryName = @NewCountryName)
+        BEGIN
+            PRINT 'Błąd: Kraj o podanej nowej nazwie już istnieje.';
+            RETURN;
+        END
+
+        
+        UPDATE Countries
+        SET CountryName = @NewCountryName
+        WHERE CountryID = @CountryID;
+
+        PRINT 'Nazwa kraju została pomyślnie zaktualizowana.';
+    END TRY
+    BEGIN CATCH
+        PRINT 'Wystąpił błąd podczas aktualizacji kraju: ' + ERROR_MESSAGE();
+    END CATCH
+END;
+
+
+-CITIES
+
+
+CREATE PROCEDURE AddCity
+    @CityName NVARCHAR(100),
+    @PostalCode NVARCHAR(6),
+    @CountryID INT
+AS
+BEGIN
+    BEGIN TRY
+        
+        IF NOT EXISTS (SELECT 1 FROM Countries WHERE CountryID = @CountryID)
+        BEGIN
+            PRINT 'Błąd: Kraj o podanym ID nie istnieje.';
+            RETURN;
+        END
+
+        
+        IF EXISTS (SELECT 1 FROM Cities WHERE CityName = @CityName AND PostalCode = @PostalCode AND CountryID = @CountryID)
+        BEGIN
+            PRINT 'Błąd: Miasto o podanej nazwie i kodzie pocztowym już istnieje w wybranym kraju.';
+            RETURN;
+        END
+
+        
+        INSERT INTO Cities (CityName, PostalCode, CountryID)
+        VALUES (@CityName, @PostalCode, @CountryID);
+
+        PRINT 'Miasto zostało pomyślnie dodane.';
+    END TRY
+    BEGIN CATCH
+        PRINT 'Wystąpił błąd podczas dodawania miasta: ' + ERROR_MESSAGE();
+    END CATCH
+END;
+
+
+
+
+CREATE PROCEDURE UpdateCity
+    @CityID INT,
+    @NewCityName NVARCHAR(100) = NULL,
+    @NewPostalCode NVARCHAR(20) = NULL
+AS
+BEGIN
+    
+    IF EXISTS (SELECT 1 FROM Cities WHERE CityID = @CityID)
+    BEGIN
+        
+        DECLARE @CountryID INT;
+        SELECT @CountryID = CountryID FROM Cities WHERE CityID = @CityID;
+
+        
+        IF @NewCityName IS NOT NULL AND EXISTS (
+            SELECT 1 
+            FROM Cities 
+            WHERE CityName = @NewCityName AND CountryID = @CountryID AND CityID <> @CityID
+        )
+        BEGIN
+            
+            PRINT 'Miasto o tej nazwie już istnieje w wybranym kraju. Aktualizacja nie może zostać wykonana.';
+        END
+        ELSE
+        BEGIN
+            UPDATE Cities
+            SET 
+                CityName = ISNULL(@NewCityName, CityName),   
+                PostalCode = ISNULL(@NewPostalCode, PostalCode)  
+            WHERE CityID = @CityID;
+
+            PRINT 'Dane miasta zostały zaktualizowane.';
+        END
+    END
+    ELSE
+    BEGIN
+        
+        PRINT 'Miasto o podanym CityID nie zostało znalezione.';
+    END
+END;
+            
 CREATE PROCEDURE AddUser
     @FirstName NVARCHAR(40),
     @LastName NVARCHAR(40),
@@ -1711,3 +1929,448 @@ BEGIN
     END CATCH;
 END;
 GO
+
+
+
+
+
+
+CREATE PROCEDURE AddTranslatedLanguage
+    @TranslatorID INT,
+    @LanguageID INT
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @TranslatorID AND RoleID = 2)
+    BEGIN
+        PRINT 'Użytkownik nie jest tłumaczem.';
+        RETURN;
+    END;
+
+    
+    IF NOT EXISTS (SELECT 1 FROM Languages WHERE LanguageID = @LanguageID)
+    BEGIN
+        PRINT 'Podany język nie istnieje.';
+        RETURN;
+    END;
+
+    
+    IF EXISTS (SELECT 1 FROM TranslatedLanguage WHERE TranslatorID = @TranslatorID AND LanguageID = @LanguageID)
+    BEGIN
+        PRINT 'Rekord już istnieje.';
+        RETURN;
+    END;
+
+    
+    INSERT INTO TranslatedLanguage (TranslatorID, LanguageID)
+    VALUES (@TranslatorID, @LanguageID);
+    PRINT 'Rekord został dodany.';
+END;
+
+
+
+CREATE PROCEDURE UpdateTranslatedLanguage
+    @OldTranslatorID INT,
+    @OldLanguageID INT,
+    @NewTranslatorID INT,
+    @NewLanguageID INT
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1 FROM TranslatedLanguage WHERE TranslatorID = @OldTranslatorID AND LanguageID = @OldLanguageID)
+    BEGIN
+        PRINT 'Rekord do modyfikacji nie istnieje.';
+        RETURN;
+    END;
+
+    
+    IF NOT EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @NewTranslatorID AND RoleID = 2)
+    BEGIN
+        PRINT 'Nowy tłumacz nie ma odpowiedniej roli.';
+        RETURN;
+    END;
+
+    
+    IF NOT EXISTS (SELECT 1 FROM Languages WHERE LanguageID = @NewLanguageID)
+    BEGIN
+        PRINT 'Podany język nie istnieje.';
+        RETURN;
+    END;
+
+    
+    IF EXISTS (SELECT 1 FROM TranslatedLanguage WHERE TranslatorID = @NewTranslatorID AND LanguageID = @NewLanguageID)
+    BEGIN
+        PRINT 'Nowy rekord już istnieje.';
+        RETURN;
+    END;
+
+    
+    UPDATE TranslatedLanguage
+    SET TranslatorID = @NewTranslatorID, LanguageID = @NewLanguageID
+    WHERE TranslatorID = @OldTranslatorID AND LanguageID = @OldLanguageID;
+
+    PRINT 'Rekord został zaktualizowany.';
+END;
+
+
+
+CREATE PROCEDURE DeleteTranslatedLanguage
+    @TranslatorID INT,
+    @LanguageID INT
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1 FROM TranslatedLanguage WHERE TranslatorID = @TranslatorID AND LanguageID = @LanguageID)
+    BEGIN
+        PRINT 'Rekord do usunięcia nie istnieje.';
+        RETURN;
+    END;
+
+    
+    DELETE FROM TranslatedLanguage
+    WHERE TranslatorID = @TranslatorID AND LanguageID = @LanguageID;
+
+    PRINT 'Rekord został usunięty.';
+END;
+
+
+
+
+
+
+CREATE PROCEDURE AddRoom
+    @RoomName NVARCHAR(100),
+    @Street NVARCHAR(100),
+    @CityID INT,
+    @Limit INT
+AS
+BEGIN
+    
+    IF EXISTS (SELECT 1 FROM Rooms WHERE RoomName = @RoomName AND CityID = @CityID)
+    BEGIN
+        PRINT 'Sala o podanej nazwie już istnieje w tym mieście.';
+        RETURN;
+    END;
+
+    
+    IF @Limit <= 0
+    BEGIN
+        PRINT 'Limit osób musi być większy niż 0.';
+        RETURN;
+    END;
+
+    
+    INSERT INTO Rooms (RoomName, Street, CityID, Limit)
+    VALUES (@RoomName, @Street, @CityID, @Limit);
+
+    PRINT 'Sala została dodana.';
+END;
+
+
+
+CREATE PROCEDURE UpdateRoom
+    @OldRoomID INT,
+    @NewRoomName NVARCHAR(100),
+
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1 FROM Rooms WHERE RoomID = @OldRoomID)
+    BEGIN
+        PRINT 'Sala do modyfikacji nie istnieje.';
+        RETURN;
+    END;
+
+    
+    IF EXISTS (SELECT 1 FROM Rooms WHERE RoomName = @NewRoomName AND CityID = @NewCityID AND RoomID != @OldRoomID)
+    BEGIN
+        PRINT 'Sala o podanej nazwie już istnieje w tym mieście.';
+        RETURN;
+    END;
+
+    
+    UPDATE Rooms
+    SET RoomName = @NewRoomName
+    WHERE RoomID = @OldRoomID;
+
+    PRINT 'Sala została zaktualizowana.';
+END;
+
+
+
+
+
+CREATE PROCEDURE AddInternship
+    @StudiesID INT,
+    @InternshipCoordinatorID INT,
+    @StartDate DATE,
+    @EndDate DATE,
+    @NumberOfHours INT,
+    @Term INT
+AS
+BEGIN
+    
+    DECLARE @NumberOfTerms INT;
+    SELECT @NumberOfTerms = NumberOfTerms FROM Studies WHERE StudiesID = @StudiesID;
+    
+    IF @Term < 1 OR @Term > @NumberOfTerms
+    BEGIN
+        PRINT 'Invalid Term for the given Studies.';
+        RETURN;
+    END
+
+    
+    IF EXISTS (SELECT 1 FROM Internship WHERE StudiesID = @StudiesID AND Term = @Term)
+    BEGIN
+        PRINT 'There is already an internship for this term of these studies.';
+        RETURN;
+    END
+
+    
+    IF DATEDIFF(DAY, @StartDate, @EndDate) <> 14
+    BEGIN
+        PRINT 'Internship must last exactly 14 days.';
+        RETURN;
+    END
+
+    
+    IF NOT EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @InternshipCoordinatorID AND RoleID = 4)
+    BEGIN
+        PRINT 'The specified user is not a coordinator for internships.';
+        RETURN;
+    END
+
+    
+    IF EXISTS (
+        SELECT 1 
+        FROM StudyMeetings SM
+        INNER JOIN Subjects S ON SM.SubjectID = S.SubjectID
+        WHERE S.StudiesID = @StudiesID
+        AND ((@StartDate BETWEEN SM.StartTime AND SM.EndTime) OR (@EndDate BETWEEN SM.StartTime AND SM.EndTime))
+    )
+    BEGIN
+        PRINT 'Internship overlaps with a study meeting for the given studies.';
+        RETURN;
+    END
+
+    
+    INSERT INTO Internship (StudiesID, InternshipCoordinatorID, StartDate, EndDate, NumberOfHours, Term)
+    VALUES (@StudiesID, @InternshipCoordinatorID, @StartDate, @EndDate, @NumberOfHours, @Term);
+
+    PRINT 'Internship added successfully.';
+END;
+
+
+
+
+
+CREATE PROCEDURE UpdateInternship
+    @InternshipID INT,
+    @StudiesID INT,
+    @InternshipCoordinatorID INT,
+    @StartDate DATE,
+    @EndDate DATE,
+    @NumberOfHours INT,
+    @Term INT
+AS
+BEGIN
+    
+    DECLARE @NumberOfTerms INT;
+    SELECT @NumberOfTerms = NumberOfTerms FROM Studies WHERE StudiesID = @StudiesID;
+    
+    IF @Term < 1 OR @Term > @NumberOfTerms
+    BEGIN
+        PRINT 'Invalid Term for the given Studies.';
+        RETURN;
+    END
+
+    
+    IF EXISTS (SELECT 1 FROM Internship WHERE StudiesID = @StudiesID AND Term = @Term AND InternshipID != @InternshipID)
+    BEGIN
+        PRINT 'There is already an internship for this term of these studies.';
+        RETURN;
+    END
+
+    
+    IF DATEDIFF(DAY, @StartDate, @EndDate) <> 14
+    BEGIN
+        PRINT 'Internship must last exactly 14 days.';
+        RETURN;
+    END
+
+    
+    IF NOT EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @InternshipCoordinatorID AND RoleID = 4)
+    BEGIN
+        PRINT 'The specified user is not a coordinator for internships.';
+        RETURN;
+    END
+
+    
+    IF EXISTS (
+        SELECT 1 
+        FROM StudyMeetings SM
+        INNER JOIN Subjects S ON SM.SubjectID = S.SubjectID
+        WHERE S.StudiesID = @StudiesID
+        AND ((@StartDate BETWEEN SM.StartTime AND SM.EndTime) OR (@EndDate BETWEEN SM.StartTime AND SM.EndTime))
+    )
+    BEGIN
+        PRINT 'Internship overlaps with a study meeting for the given studies.';
+        RETURN;
+    END
+
+    
+    UPDATE Internship
+    SET StudiesID = @StudiesID, 
+        InternshipCoordinatorID = @InternshipCoordinatorID, 
+        StartDate = @StartDate, 
+        EndDate = @EndDate, 
+        NumberOfHours = @NumberOfHours, 
+        Term = @Term
+    WHERE InternshipID = @InternshipID;
+
+    PRINT 'Internship updated successfully.';
+END;
+
+
+
+
+ 
+CREATE PROCEDURE DeleteInternship
+    @InternshipID INT
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1 FROM Internship WHERE InternshipID = @InternshipID)
+    BEGIN
+        PRINT 'Internship not found.';
+        RETURN;
+    END
+
+    
+    DELETE FROM Internship WHERE InternshipID = @InternshipID;
+
+    PRINT 'Internship deleted successfully.';
+END;
+
+
+
+
+
+
+CREATE PROCEDURE AddCourseModulePassed
+    @ModuleID INT,
+    @StudentID INT,
+    @Passed BIT
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1 FROM Modules WHERE ModuleID = @ModuleID)
+    BEGIN
+        PRINT 'Moduł o podanym ID nie istnieje.'
+        RETURN
+    END
+    
+    IF NOT EXISTS (SELECT 1 FROM Students WHERE StudentID = @StudentID)
+    BEGIN
+        PRINT 'Student o podanym ID nie istnieje.'
+        RETURN
+    END
+    
+    
+    IF NOT EXISTS (SELECT 1
+                   FROM Orders O
+                   JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   WHERE O.StudentID = @StudentID AND OD.TypeOfActivity = 2 
+                   AND OD.ActivityID IN (SELECT CourseID FROM Courses WHERE CourseID = OD.ActivityID)
+                   AND EXISTS (SELECT 1 FROM CourseModules CM WHERE CM.CourseID = OD.ActivityID AND CM.ModuleID = @ModuleID))
+    BEGIN
+        PRINT 'Student nie jest zapisany na kurs lub nie ma dostępu do tego modułu.'
+        RETURN
+    END
+    
+    
+    IF EXISTS (SELECT 1 FROM CourseModulePassed WHERE ModuleID = @ModuleID AND StudentID = @StudentID)
+    BEGIN
+        PRINT 'Rekord już istnieje dla tego studenta i modułu.'
+        RETURN
+    END
+    
+    
+    INSERT INTO CourseModulePassed (ModuleID, StudentID, Passed)
+    VALUES (@ModuleID, @StudentID, @Passed)
+
+    PRINT 'Rekord został pomyślnie dodany.'
+END
+
+
+
+
+CREATE PROCEDURE UpdateCourseModulePassed
+    @ModuleID INT,
+    @StudentID INT,
+    @Passed BIT
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1
+                   FROM Orders O
+                   JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   WHERE O.StudentID = @StudentID AND OD.TypeOfActivity = 2 
+                   AND OD.ActivityID IN (SELECT CourseID FROM Courses WHERE CourseID = OD.ActivityID)
+                   AND EXISTS (SELECT 1 FROM CourseModules CM WHERE CM.CourseID = OD.ActivityID AND CM.ModuleID = @ModuleID))
+    BEGIN
+        PRINT 'Student nie jest zapisany na kurs lub nie ma dostępu do tego modułu.'
+        RETURN
+    END
+    
+    
+    IF NOT EXISTS (SELECT 1 FROM CourseModulePassed WHERE ModuleID = @ModuleID AND StudentID = @StudentID)
+    BEGIN
+        PRINT 'Rekord do modyfikacji nie istnieje.'
+        RETURN
+    END
+    
+    
+    UPDATE CourseModulePassed
+    SET Passed = @Passed
+    WHERE ModuleID = @ModuleID AND StudentID = @StudentID
+
+    PRINT 'Rekord został pomyślnie zaktualizowany.'
+END
+
+
+
+
+CREATE PROCEDURE DeleteCourseModulePassed
+    @ModuleID INT,
+    @StudentID INT
+AS
+BEGIN
+    
+    IF NOT EXISTS (SELECT 1
+                   FROM Orders O
+                   JOIN OrderDetails OD ON O.OrderID = OD.OrderID
+                   WHERE O.StudentID = @StudentID AND OD.TypeOfActivity = 2 
+                   AND OD.ActivityID IN (SELECT CourseID FROM Courses WHERE CourseID = OD.ActivityID)
+                   AND EXISTS (SELECT 1 FROM CourseModules CM WHERE CM.CourseID = OD.ActivityID AND CM.ModuleID = @ModuleID))
+    BEGIN
+        PRINT 'Student nie jest zapisany na kurs lub nie ma dostępu do tego modułu.'
+        RETURN
+    END
+    
+    
+    IF NOT EXISTS (SELECT 1 FROM CourseModulePassed WHERE ModuleID = @ModuleID AND StudentID = @StudentID)
+    BEGIN
+        PRINT 'Rekord do usunięcia nie istnieje.'
+        RETURN
+    END
+    
+    
+    DELETE FROM CourseModulePassed
+    WHERE ModuleID = @ModuleID AND StudentID = @StudentID
+
+    PRINT 'Rekord został pomyślnie usunięty.'
+END
+
+
+

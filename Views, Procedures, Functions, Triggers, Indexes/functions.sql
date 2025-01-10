@@ -78,3 +78,46 @@ BEGIN
 END;
 GO
 
+
+CREATE FUNCTION GetStudentOrders(@StudentID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT 
+        o.OrderID,
+        o.OrderDate,
+        o.DeferredDate,
+        o.TotalPrice,
+        o.PaymentStatus,
+        od.DetailID,
+        od.ActivityID,
+        od.Price AS DetailPrice,
+        od.PaymentStatus AS DetailPaymentStatus
+    FROM Orders o
+    JOIN OrderDetails od ON o.OrderID = od.OrderID
+    WHERE o.StudentID = @StudentID
+);
+
+
+
+CREATE FUNCTION GetProductsFromOrders
+(
+    @StudentID INT
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT 
+        OD.OrderID,
+        OD.ActivityID,
+        OD.TypeOfActivity
+    FROM 
+        Orders O
+    INNER JOIN 
+        OrderDetails OD ON O.OrderID = OD.OrderID
+    WHERE 
+        O.StudentID = @StudentID
+);
+
