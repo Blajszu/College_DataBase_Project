@@ -208,3 +208,164 @@ END;
 GO
 
 
+
+CREATE FUNCTION GetAvailableRooms
+(
+    @StartTime DATETIME,
+    @EndTime DATETIME,
+    @CityID INT
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    -- Sprawdzenie, czy CityID istnieje w tabeli Cities
+    IF EXISTS (SELECT 1 FROM Cities WHERE CityID = @CityID)
+    BEGIN
+        -- Pobranie wolnych sal w podanym czasie w danym mieście
+        SELECT Rooms.RoomID, Rooms.RoomName, Rooms.Street, Rooms.CityID, Rooms.Limit
+        FROM Rooms
+        WHERE Rooms.CityID = @CityID
+        AND Rooms.RoomID NOT IN 
+        (
+            -- Pobranie wszystkich zajętych sal w danym przedziale czasowym
+            SELECT RoomID
+            FROM VW_RoomsAvailability
+            WHERE (@StartTime BETWEEN StartDate AND EndDate) 
+            OR (@EndTime BETWEEN StartDate AND EndDate)
+            OR (StartDate BETWEEN @StartTime AND @EndTime)
+            OR (EndDate BETWEEN @StartTime AND @EndTime)
+        )
+    END
+    ELSE
+    BEGIN
+        -- Zwrócenie pustego zestawu danych, jeśli CityID nie istnieje
+        THROW 50002, 'CityID does not exist in the Cities table.', 1;
+    END
+);
+
+CREATE FUNCTION GetStudentAttendanceAtSubjects (@StudentID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+    
+    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
+    BEGIN
+        
+        SELECT *
+        FROM vw_StudentsAttendanceAtSubjects
+        WHERE StudentID = @StudentID;
+    END
+    ELSE
+    BEGIN
+        
+        THROW 50001, 'User is not a student (RoleID != 1).', 1;
+    END
+);
+
+
+CREATE FUNCTION GetStudentResultsFromStudies (@StudentID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+    
+    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
+    BEGIN
+        
+        SELECT
+            U.UserID,  
+            U.FirstName AS StudentFirstName,
+            U.LastName AS StudentLastName,
+            S.SubjectName,
+            G.GradeName
+        FROM SubjectsResults SR
+        JOIN Users U ON SR.StudentID = U.UserID
+        JOIN Subjects S ON SR.SubjectID = S.SubjectID
+        JOIN Grades G ON SR.GradeID = G.GradeID
+        WHERE SR.StudentID = @StudentID;
+    END
+    ELSE
+    BEGIN
+        
+        THROW 50001, 'User is not a student (RoleID != 1).', 1;
+    END
+);
+
+
+
+CREATE FUNCTION GetCourseModulesPassed (@StudentID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+    
+    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
+    BEGIN
+        
+        SELECT
+            CMP.CourseID,
+            CMP.CourseName,
+            CMP.ModuleID,
+            CMP.ModuleName,
+            CMP.FirstName,
+            CMP.LastName,
+            CMP.Passed
+        FROM VW_CourseModulesPassed CMP
+        WHERE CMP.StudentID = @StudentID AND CMP.Passed = 1;
+    END
+    ELSE
+    BEGIN
+        
+        THROW 50001, 'User is not a student (RoleID != 1).', 1;
+    END
+);
+
+
+CREATE FUNCTION GetFutureMeetingsForStudent (@StudentID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+    
+    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
+    BEGIN
+        
+        SELECT *
+        FROM VW_allUsersFutureMeetings
+        WHERE UserID = @StudentID;
+    END
+    ELSE
+    BEGIN
+        
+        THROW 50001, 'User is not a student (RoleID != 1).', 1;
+    END
+);
+
+
+CREATE FUNCTION GetCurrentMeetingsForStudent (@StudentID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+    
+    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
+    BEGIN
+        
+        SELECT *
+        FROM VW_allUsersCurrentMeetings
+        WHERE UserID = @StudentID;
+    END
+    ELSE
+    BEGIN
+        
+        THROW 50001, 'User is not a student (RoleID != 1).', 1;
+    END
+);
+
+
+
+
+
+

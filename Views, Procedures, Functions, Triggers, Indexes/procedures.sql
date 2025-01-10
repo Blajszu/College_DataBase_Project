@@ -3087,3 +3087,52 @@ END;
 
 
 
+CREATE PROCEDURE ActivateDeactivateUser
+(
+    @UserId INT,
+    @Activate BIT 
+)
+AS
+BEGIN
+    
+    IF EXISTS (SELECT 1 FROM Users WHERE UserId = @UserId)
+    BEGIN
+        
+        DECLARE @CurrentStatus BIT;
+        SELECT @CurrentStatus = Active FROM Users WHERE UserId = @UserId;
+
+        
+        IF @CurrentStatus <> @Activate
+        BEGIN
+            
+            UPDATE Users
+            SET Active = @Activate
+            WHERE UserId = @UserId;
+
+            
+            IF @Activate = 1
+            BEGIN
+                PRINT 'User account activated.';
+            END
+            ELSE
+            BEGIN
+                PRINT 'User account deactivated.';
+            END
+        END
+        ELSE
+        BEGIN
+            
+            IF @Activate = 1
+                THROW 50002, 'User account is already active.', 1;
+            ELSE
+                THROW 50003, 'User account is already deactivated.', 1;
+        END
+    END
+    ELSE
+    BEGIN
+        
+        THROW 50001, 'User does not exist.', 1;
+    END
+END;
+
+
