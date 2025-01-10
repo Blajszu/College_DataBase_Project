@@ -432,7 +432,6 @@ RETURNS TABLE
 
     UNION
 
-<<<<<<< Updated upstream
     SELECT
         internshipCoordinatorID,
         CASE
@@ -448,26 +447,6 @@ SELECT
 FROM t1
 GROUP BY EmployeeID
 )
-=======
-        SELECT 
-            InternshipCoordinatorID AS EmployeeID, 
-            ISNULL(DATEDIFF(minute, 
-                             CASE 
-                                WHEN Internship.StartDate >= @StartTime THEN Internship.StartDate 
-                                ELSE @StartTime 
-                             END,
-                             CASE 
-                                WHEN Internship.EndDate <= @EndTime THEN Internship.EndDate 
-                                ELSE @EndTime 
-                             END), 0) AS liczbaminut
-        FROM Internship
-    )
-    SELECT 
-        EmployeeID, 
-        ROUND(SUM(liczbaminut) / 60.0, 2) AS liczbagodzinpracy
-    FROM t1
-    GROUP BY EmployeeID
-);
 
 
 
@@ -515,7 +494,6 @@ RETURN
         AND vw_CoursesCertificates.LastName = @LastName
 );
 
-
 CREATE FUNCTION dbo.GetMeetingsInCity
 (
     @cityName NVARCHAR(100)
@@ -539,4 +517,3 @@ RETURN
     WHERE CityName = @cityName  
 );
 
->>>>>>> Stashed changes
