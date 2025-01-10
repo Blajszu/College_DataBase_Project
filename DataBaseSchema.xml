@@ -19,7 +19,7 @@
         </Counter>
         <Counter>
             <Name>column</Name>
-            <Value>228</Value>
+            <Value>229</Value>
             <Prefix>c</Prefix>
         </Counter>
         <Counter>
@@ -350,6 +350,15 @@
                 <Column Id="c123">
                     <Name>DateOfBirth</Name>
                     <Type>date</Type>
+                    <Description></Description>
+                    <Nullable>false</Nullable>
+                    <DefaultValue></DefaultValue>
+                    <CheckExpression></CheckExpression>
+                    <Properties/>
+                </Column>
+                <Column Id="c229">
+                    <Name>Active</Name>
+                    <Type>int</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -1030,7 +1039,7 @@
                     <Name>Price</Name>
                     <Type>money</Type>
                     <Description></Description>
-                    <Nullable>false</Nullable>
+                    <Nullable>true</Nullable>
                     <DefaultValue></DefaultValue>
                     <CheckExpression></CheckExpression>
                     <Properties/>
@@ -3408,7 +3417,7 @@
             <X>7214.5</X>
             <Y>6929.5</Y>
             <Width>169.0</Width>
-            <Height>148.0</Height>
+            <Height>159.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
             <Table>t28</Table>
@@ -3715,9 +3724,9 @@
             <FixedSize>false</FixedSize>
         </TableDisplay>
         <TableDisplay Id="td41">
-            <X>6018.5</X>
-            <Y>6850.5</Y>
-            <Width>172.0</Width>
+            <X>6010.5</X>
+            <Y>6849.5</Y>
+            <Width>185.0</Width>
             <Height>91.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
@@ -5011,11 +5020,11 @@
                 </ControlPoint>
                 <ControlPoint>
                     <X>6830.5</X>
-                    <Y>6921.5</Y>
+                    <Y>6920.5</Y>
                 </ControlPoint>
                 <ControlPoint>
-                    <X>6104.5</X>
-                    <Y>6921.5</Y>
+                    <X>6096.5</X>
+                    <Y>6920.5</Y>
                 </ControlPoint>
             </ControlPoints>
             <PkTableDisplay>td1</PkTableDisplay>
@@ -5035,12 +5044,12 @@
                     <Y>6271.5</Y>
                 </ControlPoint>
                 <ControlPoint>
-                    <X>6156.5</X>
+                    <X>6148.5</X>
                     <Y>6271.5</Y>
                 </ControlPoint>
                 <ControlPoint>
-                    <X>6156.5</X>
-                    <Y>6894.5</Y>
+                    <X>6148.5</X>
+                    <Y>6893.5</Y>
                 </ControlPoint>
             </ControlPoints>
             <PkTableDisplay>td23</PkTableDisplay>
@@ -5056,12 +5065,12 @@
                     <Y>6404.5</Y>
                 </ControlPoint>
                 <ControlPoint>
-                    <X>6177.5</X>
+                    <X>6169.5</X>
                     <Y>6404.5</Y>
                 </ControlPoint>
                 <ControlPoint>
-                    <X>6177.5</X>
-                    <Y>6916.5</Y>
+                    <X>6169.5</X>
+                    <Y>6915.5</Y>
                 </ControlPoint>
             </ControlPoints>
             <PkTableDisplay>td24</PkTableDisplay>
@@ -5082,11 +5091,11 @@
                 </ControlPoint>
                 <ControlPoint>
                     <X>6170.5</X>
-                    <Y>6893.5</Y>
+                    <Y>6892.5</Y>
                 </ControlPoint>
                 <ControlPoint>
-                    <X>6084.5</X>
-                    <Y>6893.5</Y>
+                    <X>6076.5</X>
+                    <Y>6892.5</Y>
                 </ControlPoint>
             </ControlPoints>
             <PkTableDisplay>td7</PkTableDisplay>
