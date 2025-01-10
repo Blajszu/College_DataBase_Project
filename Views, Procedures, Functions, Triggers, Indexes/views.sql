@@ -1523,4 +1523,24 @@ INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
 WHERE TypeOfActivity=1 AND 
 DATENAME(DAY,StartDate)+' '+DATENAME(MONTH,StartDate)+' '+DATENAME(YEAR,StartDate)+' '+DATENAME(HOUR,StartDate)+':'+DATENAME(MINUTE,StartDate) > GETDATE()
 
+CREATE VIEW vw_NumberOfHoursOfWOrkForAllEmployees as
+with t1 as (
+select EmployeeID, (ISNULL(DATEDIFF(minute,sm.EndTime , sm.StartTime), 0)+ ISNULL(DATEDIFF(minute,sm1.EndTime, sm1.StartTime), 0)+ISNULL(DATEDIFF(minute,w.EndDate,w.StartDate), 0)+ ISNULL(DATEDIFF(minute,w1.EndDate, w1.StartDate), 0)+ISNULL(DATEDIFF(minute,ocm.EndDate, ocm.StartDate), 0)+ISNULL(DATEDIFF(minute,ocm1.EndDate, ocm1.StartDate), 0)+ISNULL(DATEDIFF(minute,scm.EndDate,scm.StartDate), 0)+ISNULL(DATEDIFF(minute,scm1.EndDate,scm1.StartDate), 0)) * (-1) as liczbaminut from Employees
+left outer join StudyMeetings as sm on sm.LecturerID = Employees.EmployeeID
+left outer join StudyMeetings as sm1 on sm1.TranslatorID = Employees.EmployeeID
+left outer join Webinars as w on w.TeacherID = Employees.EmployeeID
+left outer join Webinars as w1 on w1.TranslatorID = Employees.EmployeeID
+left outer join CourseModules as cm on cm.LecturerID = Employees.EmployeeID
+left outer join CourseModules as cm1 on cm1.TranslatorID = Employees.EmployeeID
+left outer join OnlineCourseMeeting as ocm on ocm.ModuleID = cm.ModuleID
+left outer join OnlineCourseMeeting as ocm1 on ocm1.ModuleID = cm1.ModuleID
+left outer join StationaryCourseMeeting as scm on scm.ModuleID = cm.ModuleID
+left outer join StationaryCourseMeeting as scm1 on scm1.ModuleID = cm1.ModuleID
+UNION
+select internshipCoordinatorID, 3000 from internship
+)
+
+select employeeid, round(SUM(liczbaminut)/60,2) as liczbagodzinpracy from t1
+group by EmployeeID
+
 
