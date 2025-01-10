@@ -982,7 +982,7 @@ INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
 WHERE TypeOfActivity=1
 
 --wszystkie przeszłe studyjne użytkowników
-CREATE VIEW VW_allUsersPastStudyMeetings
+CREATE VIEW VW_allUsersPastStudyMeetings AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, 
 (SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
 SubjectName, StartTime, EndTime
@@ -995,7 +995,7 @@ INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
 WHERE OrderDetails.TypeOfActivity=3 AND StudyMeetings.EndTime<GETDATE()
 
 --wszystkie przeszłe kursy użytkowników
-CREATE VIEW VW_allUsersPastCourseMeetings
+CREATE VIEW VW_allUsersPastCourseMeetings AS
 SELECT 
     Users.UserID, 
     Users.FirstName, 
@@ -1104,7 +1104,7 @@ WHERE TypeOfActivity=1 AND EndDate < GETDATE()
 
 
 --wszystkie przyszłe spotkania studyjne użytkowników
-CREATE VIEW VW_allUsersFutureStudyMeetings
+CREATE VIEW VW_allUsersFutureStudyMeetings AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, 
 (SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
 SubjectName, StartTime, EndTime
@@ -1117,7 +1117,7 @@ INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
 WHERE OrderDetails.TypeOfActivity=3 AND StudyMeetings.StartTime>GETDATE()
 
 --wszystkie przyszłe spotkania kursowe użytkowników
-CREATE VIEW VW_allUsersFutureCourseMeetings
+CREATE VIEW VW_allUsersFutureCourseMeetings AS
 SELECT 
     Users.UserID, 
     Users.FirstName, 
@@ -1153,7 +1153,7 @@ INNER JOIN OnlineCourseMeeting ON OnlineCourseMeeting.ModuleID = CourseModules.M
 WHERE OrderDetails.TypeOfActivity=2 AND StartDate>GETDATE()
 
 --wszystkie przeszłe webinaria użytkowników
-CREATE VIEW VW_allUsersFutureWebinars
+CREATE VIEW VW_allUsersFutureWebinars AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, Webinars.WebinarName, Webinars.StartDate, Webinars.EndDate
 FROM Users
 INNER JOIN Orders ON Orders.StudentID=Users.UserID
@@ -1163,7 +1163,7 @@ WHERE TypeOfActivity=1 AND StartDate>GETDATE()
 
 
 --wszytskie przyszłe spotkania do których jest przypisany użytkownik
-CREATE VIEW VW_allUsersFutureMeetings
+CREATE VIEW VW_allUsersFutureMeetings AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, 
 (SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
 (SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
@@ -1226,7 +1226,7 @@ INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
 WHERE TypeOfActivity=1 AND StartDate > GETDATE()
 
 --wszystkie aktualnie trwające spotkania studyjne użytkowników
-CREATE VIEW VW_allUsersCurrentStudyMeetings
+CREATE VIEW VW_allUsersCurrentStudyMeetings AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, 
 (SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As NazwaKierunku,
 SubjectName, StartTime, EndTime
@@ -1239,7 +1239,7 @@ INNER JOIN Subjects ON Subjects.SubjectID=StudyMeetings.SubjectID
 WHERE OrderDetails.TypeOfActivity=3 AND StudyMeetings.StartTime<GETDATE() AND StudyMeetings.StartTime>GETDATE()
 
 --wszystkie aktualne spotkania kursowe użytkowników
-CREATE VIEW VW_allUsersCurrentCourseMeetings
+CREATE VIEW VW_allUsersCurrentCourseMeetings AS
 SELECT 
     Users.UserID, 
     Users.FirstName, 
@@ -1285,7 +1285,7 @@ WHERE TypeOfActivity=1 AND StartDate<GETDATE() AND EndDate>GETDATE()
 
 
 --wszytskie aktualnie trwające spotkania do których jest przypisany użytkownik
-CREATE VIEW VW_allUsersCurrentMeetings
+CREATE VIEW VW_allUsersCurrentMeetings AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, 
 (SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
 (SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
@@ -1349,7 +1349,7 @@ INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
 WHERE TypeOfActivity=1 AND StartDate < GETDATE() AND EndDate > GETDATE()
 
 --wszystkie aktualnie trwające stacjonarne spotkania wraz z salą i adresem
-CREATE VIEW VW_allUsersStationaryMeetingsWithRoomAndAddresses
+CREATE VIEW VW_allUsersStationaryMeetingsWithRoomAndAddresses AS
 SELECT Users.UserID, Users.FirstName, Users.LastName, 
 (SELECT TypeName FROM ActivitiesTypes WHERE OrderDetails.TypeOfActivity=ActivitiesTypes.ActivityTypeID) as ActivityType,
 (SELECT StudyName FROM Studies WHERE Subjects.StudiesID=Studies.StudiesID) As ActivityName,
