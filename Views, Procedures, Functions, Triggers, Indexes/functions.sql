@@ -99,11 +99,9 @@ RETURN
     WHERE o.StudentID = @StudentID
 );
 
-
-
-CREATE FUNCTION GetProductsFromOrders
+CREATE FUNCTION GetProductsFromOrder
 (
-    @StudentID INT
+    @OrderID INT
 )
 RETURNS TABLE
 AS
@@ -114,10 +112,7 @@ RETURN
         OD.ActivityID,
         OD.TypeOfActivity
     FROM 
-        Orders O
-    INNER JOIN 
-        OrderDetails OD ON O.OrderID = OD.OrderID
+        OrderDetails OD
     WHERE 
-        O.StudentID = @StudentID
+        OD.OrderID = @OrderID
 );
-
