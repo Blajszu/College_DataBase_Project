@@ -27,66 +27,6 @@ BEGIN
     INNER JOIN inserted i ON o.OrderID = i.OrderID;
 END;
 
-CREATE TRIGGER trg_BlockPaymentLinkIfPriceIsZero
-ON OrderDetails
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    IF EXISTS (
-        SELECT 1
-        FROM inserted
-        WHERE (Price = 0 OR Price IS NULL)
-          AND PaymentLink IS NOT NULL
-    )
-    BEGIN
-        RAISERROR('Nie można dodać linku płatności, jeśli cena wynosi 0 lub NULL.', 16, 1);
-        ROLLBACK TRANSACTION;
-    END;
-END;
-
-
-CREATE TRIGGER trg_BlockPaymentLinkIfPriceIsZero_StudyMeetingPayments
-ON StudyMeetingPayment
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    IF EXISTS (
-        SELECT 1
-        FROM inserted
-        WHERE (Price = 0 OR Price IS NULL)
-          AND PaymentLink IS NOT NULL
-    )
-    BEGIN
-        RAISERROR('Nie można dodać linku płatności, jeśli cena wynosi 0 lub NULL.', 16, 1);
-        ROLLBACK TRANSACTION;
-    END;
-END;
-
-
-CREATE TRIGGER trg_BlockPaymentLinkIfPriceIsZero_PaymentAdvances
-ON PaymentsAdvances
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    IF EXISTS (
-        SELECT 1
-        FROM inserted
-        WHERE (Price = 0 OR Price IS NULL)
-          AND PaymentLink IS NOT NULL
-    )
-    BEGIN
-        RAISERROR('Nie można dodać linku płatności, jeśli cena wynosi 0 lub NULL.', 16, 1);
-        ROLLBACK TRANSACTION;
-    END;
-END;
-
-
 
 CREATE TRIGGER BeforeOrderDetailsInsert
 ON OrderDetails
