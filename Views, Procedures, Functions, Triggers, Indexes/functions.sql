@@ -42,8 +42,11 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1
         FROM Courses
-        WHERE CourseID = @CourseID
-          AND GETDATE() > EndDate 
+        INNER JOIN CourseModules ON Courses.CourseID = CourseModules.CourseID
+        LEFT JOIN StationaryCourseMeeting ON CourseModules.ModuleID = StationaryCourseMeeting.ModuleID
+        LEFT JOIN OnlineCourseMeeting ON CourseModules.ModuleID = OnlineCourseMeeting.ModuleID
+        WHERE Courses.CourseID = @CourseID
+        AND GETDATE() > OnlineCourseMeeting.EndDate OR GETDATE() > StationaryCourseMeeting.EndDate
     )
     BEGIN
         SET @Result = 0; 
@@ -88,8 +91,6 @@ RETURN
         o.OrderID,
         o.OrderDate,
         o.DeferredDate,
-        o.TotalPrice,
-        o.PaymentStatus,
         od.DetailID,
         od.ActivityID,
         od.Price AS DetailPrice,
@@ -118,35 +119,46 @@ RETURN
 );
 
 
-CREATE FUNCTION CheckStudentPresenceOrActivity
+CREATE FUNCTION CheckStudentPresenceOnActivity(
     @StudentID INT,
     @MeetingID INT
+)
+RETURNS NVARCHAR(255)
 AS
 BEGIN
-    IF EXISTS (SELECT 1 FROM StudyMeetingPresence 
-               WHERE StudentID = @StudentID 
+    DECLARE @PresenceMessage NVARCHAR(255);
+
+    -- Sprawdzanie obecności na spotkaniu
+    IF EXISTS (SELECT 1 FROM StudyMeetingPresence
+               WHERE StudentID = @StudentID
                AND StudyMeetingID = @MeetingID
                AND Presence = 1)
     BEGIN
-        SELECT 'Student był obecny na tym spotkaniu.' AS Presence;
+        SET @PresenceMessage = 'Student był obecny na tym spotkaniu.';
     END
     ELSE
     BEGIN
-        IF EXISTS (SELECT 1 FROM ActivityInsteadOfAbsence 
-                   WHERE StudentID = @StudentID 
+        -- Sprawdzanie, czy student odrobił spotkanie inną aktywnością
+        IF EXISTS (SELECT 1 FROM ActivityInsteadOfAbsence
+                   WHERE StudentID = @StudentID
                    AND MeetingID = @MeetingID)
         BEGIN
-            SELECT 'Student odrobił to spotkanie inną aktywnością.' AS Presence;
+            SET @PresenceMessage = 'Student odrobił to spotkanie inną aktywnością.';
         END
         ELSE
         BEGIN
-            SELECT 'Student nie był obecny na tym spotkaniu ani nie odrobił go inną aktywnością.' AS Presence;
+            SET @PresenceMessage = 'Student nie był obecny na tym spotkaniu ani nie odrobił go inną aktywnością.';
         END
     END
+
+    -- Zwracamy odpowiednią wiadomość
+    RETURN @PresenceMessage;
 END;
+GO
 
 
-CREATE FUNCTION GetRemainingSeats
+
+CREATE PROCEDURE GetRemainingSeats
     @ActivityID INT,
     @TypeOfActivity INT,
     @RemainingSeats INT OUTPUT
@@ -157,56 +169,58 @@ BEGIN
     IF @TypeOfActivity = 1
     BEGIN
         SET @RemainingSeats = 2147483647;
-        SELECT @RemainingSeats;
     END
 
     IF @TypeOfActivity = 2
     BEGIN
-        SELECT @RemainingSeats = c.StudentLimit - 
-            ISNULL(COUNT(od.OrderID), 0)
+        SELECT @RemainingSeats = c.StudentLimit -
+            (SELECT ISNULL(COUNT(*), 0)
+             FROM OrderDetails od
+             WHERE od.ActivityID = c.CourseID AND od.TypeOfActivity = 2)
         FROM Courses c
-        INNER JOIN OrderDetails od ON od.ActivityID = c.CourseID AND od.TypeOfActivity = 2
         WHERE c.CourseID = @ActivityID;
 
         IF @RemainingSeats IS NULL OR @RemainingSeats < 0
             SET @RemainingSeats = 2147483647;
-        SELECT @RemainingSeats;
     END
 
     IF @TypeOfActivity = 3
     BEGIN
-        @RemainingSeats = SELECT s.StudentLimit - 
-            ISNULL(COUNT(SMP.DetailID), 0)
+        SELECT @RemainingSeats = s.StudentLimit -
+            (SELECT ISNULL(COUNT(*), 0)
+             FROM Subjects ss
+             INNER JOIN StudyMeetings SM ON SM.SubjectID = ss.SubjectID
+             INNER JOIN StudyMeetingPayment SMP ON SMP.MeetingID = SM.MeetingID
+             WHERE ss.StudiesID = s.StudiesID)
         FROM Studies s
-        INNER JOIN Subjects ss ON ss.StudiesID = s.StudiesID
-        INNER JOIN StudyMeetings SM ON SM.SubjectID = ss.SubjectID
-        INNER JOIN StudyMeetingPayments SMP ON SMP.MeetingID = SM.MeetingID
         WHERE s.StudiesID = @ActivityID;
 
         IF @RemainingSeats IS NULL OR @RemainingSeats < 0
             SET @RemainingSeats = 2147483647;
-        SELECT @RemainingSeats;
     END
 
     IF @TypeOfActivity = 4
     BEGIN
-        SELECT @RemainingSeats = sm.StudentLimit - 
-            ISNULL(COUNT(smp.StudentID), 0)
+        SELECT @RemainingSeats = sm.StudentLimit -
+            (SELECT ISNULL(COUNT(*), 0)
+             FROM StudyMeetingPayment smp
+             WHERE smp.MeetingID = sm.MeetingID)
         FROM StationaryMeetings sm
         INNER JOIN StudyMeetings smt ON smt.MeetingID = sm.MeetingID
-        INNER JOIN StudyMeetingPayments smp ON smp.MeetingID = sm.MeetingID
         WHERE sm.MeetingID = @ActivityID;
 
         IF @RemainingSeats IS NULL OR @RemainingSeats < 0
             SET @RemainingSeats = 2147483647;
-        SELECT @RemainingSeats;
     END
-    ELSE
-    SET @RemainingSeats = -1;
-    SELECT @RemainingSeats;
+
+    -- Jeśli @RemainingSeats nie zostało ustawione
+    IF @RemainingSeats IS NULL
+        SET @RemainingSeats = -1;
+
+    -- Zwrócenie wyniku
+    SELECT @RemainingSeats AS RemainingSeats;
 END;
 GO
-
 
 
 CREATE FUNCTION GetAvailableRooms
@@ -219,29 +233,26 @@ RETURNS TABLE
 AS
 RETURN
 (
-    -- Sprawdzenie, czy CityID istnieje w tabeli Cities
-    IF EXISTS (SELECT 1 FROM Cities WHERE CityID = @CityID)
-    BEGIN
-        -- Pobranie wolnych sal w podanym czasie w danym mieście
-        SELECT Rooms.RoomID, Rooms.RoomName, Rooms.Street, Rooms.CityID, Rooms.Limit
-        FROM Rooms
-        WHERE Rooms.CityID = @CityID
-        AND Rooms.RoomID NOT IN 
-        (
-            -- Pobranie wszystkich zajętych sal w danym przedziale czasowym
-            SELECT RoomID
-            FROM VW_RoomsAvailability
-            WHERE (@StartTime BETWEEN StartDate AND EndDate) 
-            OR (@EndTime BETWEEN StartDate AND EndDate)
-            OR (StartDate BETWEEN @StartTime AND @EndTime)
-            OR (EndDate BETWEEN @StartTime AND @EndTime)
-        )
-    END
-    ELSE
-    BEGIN
-        -- Zwrócenie pustego zestawu danych, jeśli CityID nie istnieje
-        THROW 50002, 'CityID does not exist in the Cities table.', 1;
-    END
+    -- Pobranie wolnych sal w podanym czasie w danym mieście
+    SELECT Rooms.RoomID, Rooms.RoomName, Rooms.Street, Rooms.CityID, Rooms.Limit
+    FROM Rooms
+    WHERE Rooms.CityID = @CityID
+      AND EXISTS (
+          -- Sprawdzenie, czy CityID istnieje w tabeli Cities
+          SELECT 1
+          FROM Cities
+          WHERE CityID = @CityID
+      )
+      AND Rooms.RoomID NOT IN
+      (
+          -- Pobranie wszystkich zajętych sal w danym przedziale czasowym
+          SELECT RoomID
+          FROM VW_RoomsAvailability
+          WHERE (@StartTime BETWEEN StartDate AND EndDate)
+             OR (@EndTime BETWEEN StartDate AND EndDate)
+             OR (StartDate BETWEEN @StartTime AND @EndTime)
+             OR (EndDate BETWEEN @StartTime AND @EndTime)
+      )
 );
 
 CREATE FUNCTION GetStudentAttendanceAtSubjects (@StudentID INT)
@@ -249,19 +260,14 @@ RETURNS TABLE
 AS
 RETURN
 (
-    
-    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
-    BEGIN
-        
-        SELECT *
-        FROM vw_StudentsAttendanceAtSubjects
-        WHERE StudentID = @StudentID;
-    END
-    ELSE
-    BEGIN
-        
-        THROW 50001, 'User is not a student (RoleID != 1).', 1;
-    END
+    SELECT *
+    FROM vw_StudentsAttendanceAtSubjects
+    WHERE StudentID = @StudentID
+      AND EXISTS (
+          SELECT 1
+          FROM UsersRoles
+          WHERE UserID = @StudentID AND RoleID = 1
+      )
 );
 
 
@@ -270,29 +276,23 @@ RETURNS TABLE
 AS
 RETURN
 (
-    
-    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
-    BEGIN
-        
-        SELECT
-            U.UserID,  
-            U.FirstName AS StudentFirstName,
-            U.LastName AS StudentLastName,
-            S.SubjectName,
-            G.GradeName
-        FROM SubjectsResults SR
-        JOIN Users U ON SR.StudentID = U.UserID
-        JOIN Subjects S ON SR.SubjectID = S.SubjectID
-        JOIN Grades G ON SR.GradeID = G.GradeID
-        WHERE SR.StudentID = @StudentID;
-    END
-    ELSE
-    BEGIN
-        
-        THROW 50001, 'User is not a student (RoleID != 1).', 1;
-    END
+    SELECT
+        U.UserID,
+        U.FirstName AS StudentFirstName,
+        U.LastName AS StudentLastName,
+        S.SubjectName,
+        G.GradeName
+    FROM SubjectsResults SR
+    JOIN Users U ON SR.StudentID = U.UserID
+    JOIN Subjects S ON SR.SubjectID = S.SubjectID
+    JOIN Grades G ON SR.GradeID = G.GradeID
+    WHERE SR.StudentID = @StudentID
+      AND EXISTS (
+          SELECT 1
+          FROM UsersRoles UR
+          WHERE UR.UserID = @StudentID AND UR.RoleID = 1
+      )
 );
-
 
 
 CREATE FUNCTION GetCourseModulesPassed (@StudentID INT)
@@ -300,26 +300,22 @@ RETURNS TABLE
 AS
 RETURN
 (
-    
-    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
-    BEGIN
-        
-        SELECT
-            CMP.CourseID,
-            CMP.CourseName,
-            CMP.ModuleID,
-            CMP.ModuleName,
-            CMP.FirstName,
-            CMP.LastName,
-            CMP.Passed
-        FROM VW_CourseModulesPassed CMP
-        WHERE CMP.StudentID = @StudentID AND CMP.Passed = 1;
-    END
-    ELSE
-    BEGIN
-        
-        THROW 50001, 'User is not a student (RoleID != 1).', 1;
-    END
+    SELECT
+        CMP.CourseID,
+        CMP.CourseName,
+        CMP.ModuleID,
+        CMP.ModuleName,
+        CMP.FirstName,
+        CMP.LastName,
+        CMP.Passed
+    FROM VW_CourseModulesPassed CMP
+    WHERE CMP.StudentID = @StudentID
+      AND CMP.Passed = 1
+      AND EXISTS (
+          SELECT 1
+          FROM UsersRoles
+          WHERE UserID = @StudentID AND RoleID = 1
+      )
 );
 
 
@@ -328,19 +324,14 @@ RETURNS TABLE
 AS
 RETURN
 (
-    
-    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
-    BEGIN
-        
-        SELECT *
-        FROM VW_allUsersFutureMeetings
-        WHERE UserID = @StudentID;
-    END
-    ELSE
-    BEGIN
-        
-        THROW 50001, 'User is not a student (RoleID != 1).', 1;
-    END
+    SELECT *
+    FROM VW_allUsersFutureMeetings
+    WHERE UserID = @StudentID
+      AND EXISTS (
+          SELECT 1
+          FROM UsersRoles
+          WHERE UserID = @StudentID AND RoleID = 1
+      )
 );
 
 
@@ -349,20 +340,16 @@ RETURNS TABLE
 AS
 RETURN
 (
-    
-    IF EXISTS (SELECT 1 FROM UsersRoles WHERE UserID = @StudentID AND RoleID = 1)
-    BEGIN
-        
-        SELECT *
-        FROM VW_allUsersCurrentMeetings
-        WHERE UserID = @StudentID;
-    END
-    ELSE
-    BEGIN
-        
-        THROW 50001, 'User is not a student (RoleID != 1).', 1;
-    END
+    SELECT *
+    FROM VW_allUsersCurrentMeetings
+    WHERE UserID = @StudentID
+      AND EXISTS (
+          SELECT 1
+          FROM UsersRoles
+          WHERE UserID = @StudentID AND RoleID = 1
+      )
 );
+
 
 CREATE FUNCTION dbo.GetNumberOfHoursOfWorkForAllEmployees
 (
@@ -459,16 +446,13 @@ RETURNS TABLE
 AS
 RETURN
 (
-    IF NOT EXISTS (SELECT 1 FROM Users WHERE FirstName = @FirstName AND LastName = @LastName)
-    BEGIN
-        SELECT 'Brak użytkownika o podanych danych.' AS ErrorMessage;
-        RETURN;
-    END
-
-    SELECT 
-        'Diploma' AS CertificateType,
-        Studies.StudyName,
-        Grades.GradeName,
+    SELECT
+        CASE
+            WHEN EXISTS (SELECT 1 FROM Users WHERE FirstName = @FirstName AND LastName = @LastName) THEN 'Diploma'
+            ELSE 'No User Found'
+        END AS CertificateType,
+        vw_StudentsDiplomas.StudyName,  -- Zakładając, że ta kolumna istnieje w widoku
+        vw_StudentsDiplomas.GradeName,  -- Zakładając, że ta kolumna istnieje w widoku
         vw_StudentsDiplomas.StudyStart,
         vw_StudentsDiplomas.StudyEnd
     FROM
@@ -476,12 +460,12 @@ RETURN
     WHERE
         vw_StudentsDiplomas.FirstName = @FirstName
         AND vw_StudentsDiplomas.LastName = @LastName
-    
+
     UNION ALL
 
-    SELECT 
+    SELECT
         'Course Certificate' AS CertificateType,
-        Courses.CourseName,
+        vw_CoursesCertificates.CourseName,  -- Zakładając, że ta kolumna istnieje w widoku
         NULL AS GradeName,
         vw_CoursesCertificates.CourseStart,
         vw_CoursesCertificates.CourseEnd
@@ -489,10 +473,11 @@ RETURN
         Users
     INNER JOIN
         vw_CoursesCertificates
-    WHERE
+    ON
         vw_CoursesCertificates.FirstName = @FirstName
         AND vw_CoursesCertificates.LastName = @LastName
 );
+
 
 CREATE FUNCTION dbo.GetMeetingsInCity
 (
@@ -516,4 +501,3 @@ RETURN
     FROM VW_allUsersStationaryMeetingsWithRoomAndAddresses
     WHERE CityName = @cityName  
 );
-
