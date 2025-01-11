@@ -7,9 +7,10 @@ BEGIN
     SET od.PaymentStatus = 'udana',
         od.Price = 0
     FROM OrderDetails od
-    INNER JOIN inserted i ON od.OrderDetailID = i.OrderDetailID
+    INNER JOIN inserted i ON od.DetailID = i.DetailID
     WHERE i.Price IS NULL OR i.Price = 0;
 END;
+
 
 
 CREATE TRIGGER trg_SetPaymentDeferred
@@ -39,8 +40,9 @@ BEGIN
     DECLARE @StudentLimit INT;
     DECLARE @TotalBooked INT;
 
-    SELECT @UserID = O.UserID, @ActivityID = O.ActivityID, @TypeOfActivity = O.TypeOfActivity
-    FROM INSERTED O;
+    SELECT @UserID = O.StudentID, @ActivityID = I.ActivityID, @TypeOfActivity = I.TypeOfActivity
+    FROM INSERTED I
+	INNER JOIN Orders O ON I.OrderID=O.OrderID;
 
     IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @UserID AND Active = 1)
     BEGIN
@@ -54,7 +56,7 @@ BEGIN
         SELECT @StudentLimit = SM.StudentLimit
         FROM StationaryMeetings SM
         INNER JOIN StudyMeetings SM2 ON SM.MeetingID = SM2.MeetingID
-        WHERE SM2.ActivityID = @ActivityID;
+        WHERE SM2.MeetingID = @ActivityID;
 
         SELECT @TotalBooked = COUNT(O.OrderID)
         FROM Orders O
@@ -121,12 +123,14 @@ BEGIN
     DECLARE @StudentLimit INT;
     DECLARE @TotalBooked INT;
 
-    SELECT @UserID = O.UserID, 
-           @OldActivityID = O.ActivityID, 
+    SELECT @UserID = O.StudentID, 
+           @OldActivityID = OD.ActivityID, 
            @NewActivityID = I.ActivityID, 
-           @TypeOfActivity = O.TypeOfActivity
+           @TypeOfActivity = OD.TypeOfActivity
     FROM INSERTED I
     INNER JOIN DELETED D ON I.DetailID = D.DetailID
+	INNER JOIN Orders O ON O.OrderID = I.OrderID
+	INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
     WHERE I.OrderID = D.OrderID;
 
 
@@ -144,7 +148,7 @@ BEGIN
             SELECT @StudentLimit = SM.StudentLimit
             FROM StationaryMeetings SM
             INNER JOIN StudyMeetings SM2 ON SM.MeetingID = SM2.MeetingID
-            WHERE SM2.ActivityID = @NewActivityID;
+            WHERE SM2.MeetingID = @NewActivityID;
 
             SELECT @TotalBooked = COUNT(O.OrderID)
             FROM Orders O
@@ -213,14 +217,15 @@ BEGIN
     SELECT @StudiesID = StudiesID FROM INSERTED;
 
 
-    SELECT @EarliestMeetingDate = MIN(SM.MeetingDate)
+    SELECT @EarliestMeetingDate = MIN(SM.StartTime)
     FROM StudyMeetings SM
     INNER JOIN Subjects S ON SM.SubjectID = S.SubjectID
     WHERE S.StudiesID = @StudiesID;
 
     IF @EarliestMeetingDate <= @CurrentDate
     BEGIN
-        RAISERROR ('Nie można edytować danych studiów po rozpoczęciu studiów. Najwcześniejsze spotkanie miało miejsce %s.', 16, 1, @EarliestMeetingDate);
+		DECLARE @FormattedDate VARCHAR(20) = CONVERT(VARCHAR(20), @EarliestMeetingDate, 120);
+        RAISERROR ('Nie można edytować danych studiów po rozpoczęciu studiów. Najwcześniejsze spotkanie miało miejsce %s.', 16, 1, @FormattedDate);
         ROLLBACK TRANSACTION; 
         RETURN;
     END
@@ -238,14 +243,15 @@ BEGIN
 
     SELECT @StudiesID = StudiesID FROM INSERTED;
 
-    SELECT @EarliestMeetingDate = MIN(SM.MeetingDate)
+    SELECT @EarliestMeetingDate = MIN(SM.StartTime)
     FROM StudyMeetings SM
     INNER JOIN Subjects S ON SM.SubjectID = S.SubjectID
     WHERE S.StudiesID = @StudiesID;
 
     IF @EarliestMeetingDate <= @CurrentDate
     BEGIN
-        RAISERROR ('Nie można edytować danych przedmiotu po rozpoczęciu studiów. Najwcześniejsze spotkanie miało miejsce %s.', 16, 1, @EarliestMeetingDate);
+		DECLARE @FormattedDate VARCHAR(20) = CONVERT(VARCHAR(20), @EarliestMeetingDate, 120);
+        RAISERROR ('Nie można edytować danych przedmiotu po rozpoczęciu studiów. Najwcześniejsze spotkanie miało miejsce %s.', 16, 1, @FormattedDate);
         ROLLBACK TRANSACTION;
         RETURN;
     END
@@ -444,11 +450,11 @@ BEGIN
                 OR EXISTS (
                     SELECT 1
                     FROM CourseModules cm
-                    LEFT JOIN StationaryCourseModules ON StationaryCourseModules.MeetingID = cm.MeetingID
-                    LEFT JOIN OnlineCourseMeetings ON OnlineCourseMeetings.MeetingID = cm.MeetingID
+                    LEFT JOIN StationaryCourseMeetings scm ON StationaryCourseMeetings.ModuleID = cm.ModuleID
+                    LEFT JOIN OnlineCourseMeetings ocm ON OnlineCourseMeetings.ModuleID = cm.ModuleID
                     WHERE (cm.LecturerID = @UserID OR cm.TranslatorID = @UserID)
-                      AND cm.StartTime <= GETDATE()
-                      AND cm.EndTime >= GETDATE()
+                      AND ((scm.StartTime <= GETDATE()
+                      AND scm.EndTime >= GETDATE()) OR ocm.StartTime <=GETDATE() AND ocm.EndTime >= GETDATE())
                 )
                 BEGIN
                     ROLLBACK TRANSACTION;
