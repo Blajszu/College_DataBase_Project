@@ -147,16 +147,16 @@ GRANT EXECUTE ON CheckIfStudentPassed TO director;
 GRANT EXECUTE ON CheckIfStudentPassedCourse TO director;
 GRANT EXECUTE ON CheckStudentPresenceOnActivity TO director;
 GRANT EXECUTE ON fn_diagramobjects TO director;
-GRANT EXECUTE ON GetAvailableRooms TO director;
-GRANT EXECUTE ON GetCourseModulesPassed TO director;
-GRANT EXECUTE ON GetCurrentMeetingsForStudent TO director;
-GRANT EXECUTE ON GetFutureMeetingsForStudent TO director;
-GRANT EXECUTE ON GetMeetingsInCity TO director;
-GRANT EXECUTE ON GetNumberOfHoursOfWorkForAllEmployees TO director;
-GRANT EXECUTE ON GetProductsFromOrder TO director;
-GRANT EXECUTE ON GetStudentOrders TO director;
-GRANT EXECUTE ON GetStudentResultsFromStudies TO director;
-GRANT EXECUTE ON GetUserDiplomasAndCertificates TO director;
+GRANT SELECT ON GetAvailableRooms TO director;
+GRANT SELECT ON GetCourseModulesPassed TO director;
+GRANT SELECT ON GetCurrentMeetingsForStudent TO director;
+GRANT SELECT ON GetFutureMeetingsForStudent TO director;
+GRANT SELECT ON GetMeetingsInCity TO director;
+GRANT SELECT ON GetNumberOfHoursOfWorkForAllEmployees TO director;
+GRANT SELECT ON GetProductsFromOrder TO director;
+GRANT SELECT ON GetStudentOrders TO director;
+GRANT SELECT ON GetStudentResultsFromStudies TO director;
+GRANT SELECT ON GetUserDiplomasAndCertificates TO director;
 
 
 
@@ -199,7 +199,7 @@ GRANT EXECUTE ON AddStudyResult TO study_coordinator;
 GRANT EXECUTE ON DeleteStudiesResult TO study_coordinator;
 
 GRANT EXECUTE ON CheckStudentPresenceOnActivity TO study_coordinator;
-GRANT EXECUTE ON GetAvailableRooms TO study_coordinator;
+GRANT SELECT ON GetAvailableRooms TO study_coordinator;
 
 
 CREATE ROLE course_coordinator;
@@ -226,8 +226,8 @@ GRANT EXECUTE ON UpdateCourseModule TO course_coordinator;
 GRANT EXECUTE ON UpdateCourseModuleMeeting TO course_coordinator;
 GRANT EXECUTE ON UpdateCourseModulePassed TO course_coordinator;
 
-GRANT EXECUTE ON GetAvailableRooms TO course_coordinator;
-GRANT EXECUTE ON GetCourseModulesPassed TO course_coordinator;
+GRANT SELECT ON GetAvailableRooms TO course_coordinator;
+GRANT SELECT ON GetCourseModulesPassed TO course_coordinator;
 
 
 
@@ -261,7 +261,7 @@ GRANT SELECT ON vw_NumberOfHoursOfWOrkForAllEmployees TO acountant;
 GRANT SELECT ON vw_OrdersWithDetails TO acountant;
 GRANT SELECT ON vw_Students TO acountant;
 
-GRANT EXECUTE ON GetNumberOfHoursOfWorkForAllEmployees TO acountant;
+GRANT SELECT ON GetNumberOfHoursOfWorkForAllEmployees TO acountant;
 
 
 
@@ -344,15 +344,15 @@ GRANT EXECUTE ON CheckIfStudentPassed TO secretary;
 GRANT EXECUTE ON CheckIfStudentPassedCourse TO secretary;
 GRANT EXECUTE ON CheckStudentPresenceOnActivity TO secretary;
 GRANT EXECUTE ON fn_diagramobjects TO secretary;
-GRANT EXECUTE ON GetAvailableRooms TO secretary;
-GRANT EXECUTE ON GetCourseModulesPassed TO secretary;
-GRANT EXECUTE ON GetCurrentMeetingsForStudent TO secretary;
-GRANT EXECUTE ON GetFutureMeetingsForStudent TO secretary;
-GRANT EXECUTE ON GetMeetingsInCity TO secretary;
-GRANT EXECUTE ON GetProductsFromOrder TO secretary;
-GRANT EXECUTE ON GetStudentOrders TO secretary;
-GRANT EXECUTE ON GetStudentResultsFromStudies TO secretary;
-GRANT EXECUTE ON GetUserDiplomasAndCertificates TO secretary;
+GRANT SELECT ON GetAvailableRooms TO secretary;
+GRANT SELECT ON GetCourseModulesPassed TO secretary;
+GRANT SELECT ON GetCurrentMeetingsForStudent TO secretary;
+GRANT SELECT ON GetFutureMeetingsForStudent TO secretary;
+GRANT SELECT ON GetMeetingsInCity TO secretary;
+GRANT SELECT ON GetProductsFromOrder TO secretary;
+GRANT SELECT ON GetStudentOrders TO secretary;
+GRANT SELECT ON GetStudentResultsFromStudies TO secretary;
+GRANT SELECT ON GetUserDiplomasAndCertificates TO secretary;
 
 CREATE ROLE lecturer;
 GRANT EXECUTE ON AddStudyMeetingPresence TO lecturer;
@@ -386,13 +386,13 @@ GRANT EXECUTE ON ModifyOrderDetail TO student;
 GRANT EXECUTE ON CheckIfStudentPassed TO student;
 GRANT EXECUTE ON CheckIfStudentPassedCourse TO student;
 GRANT EXECUTE ON CheckStudentPresenceOnActivity TO student;
-GRANT EXECUTE ON GetCurrentMeetingsForStudent TO student;
-GRANT EXECUTE ON GetFutureMeetingsForStudent TO student;
-GRANT EXECUTE ON GetProductsFromOrder TO student;
-GRANT EXECUTE ON GetStudentOrders TO student;
-GRANT EXECUTE ON GetStudentResultsFromStudies TO student;
-GRANT EXECUTE ON GetCourseModulesPassed TO student;
-GRANT EXECUTE ON GetStudentResultsFromStudies TO student;
+GRANT SELECT ON GetCurrentMeetingsForStudent TO student;
+GRANT SELECT ON GetFutureMeetingsForStudent TO student;
+GRANT SELECT ON GetProductsFromOrder TO student;
+GRANT SELECT ON GetStudentOrders TO student;
+GRANT SELECT ON GetStudentResultsFromStudies TO student;
+GRANT SELECT ON GetCourseModulesPassed TO student;
+GRANT SELECT ON GetStudentResultsFromStudies TO student;
 
 
 
