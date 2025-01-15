@@ -1542,3 +1542,45 @@ INNER JOIN VW_CoursesStartDateEndDate vw ON vw.id=OrderDetails.ActivityID
 INNER JOIN Webinars ON Webinars.WebinarID=OrderDetails.ActivityID
 WHERE TypeOfActivity=1 AND 
 DATENAME(DAY,StartDate)+' '+DATENAME(MONTH,StartDate)+' '+DATENAME(YEAR,StartDate)+' '+DATENAME(HOUR,StartDate)+':'+DATENAME(MINUTE,StartDate) > GETDATE()
+
+CREATE VIEW VW_FutureEventsWithDetails AS
+-- Kursy
+SELECT
+    'Course' AS EventType,
+    c.CourseName AS EventName,
+    vce.[Data rozpoczęcia] AS StartDate,
+    vce.[Data zakończenia] AS EndDate
+FROM
+    Courses c
+        JOIN
+    VW_CoursesStartDateEndDate vce ON c.CourseID = vce.ID
+WHERE
+    vce.[Data rozpoczęcia] > GETDATE()
+
+UNION ALL
+
+-- Webinary
+SELECT
+    'Webinar' AS EventType,
+    w.WebinarName AS EventName,
+    w.StartDate AS StartDate,
+    w.EndDate AS EndDate
+FROM
+    Webinars w
+WHERE
+    w.StartDate > GETDATE()
+
+UNION ALL
+
+-- Studia
+SELECT
+    'Study' AS EventType,
+    s.StudyName AS EventName,
+    vsde.StartDate AS StartDate,
+    vsde.EndDate AS EndDate
+FROM
+    Studies s
+        JOIN
+    VW_StudiesStartDateEndDate vsde ON s.StudiesID = vsde.StudiesID
+WHERE
+    vsde.StartDate > GETDATE();

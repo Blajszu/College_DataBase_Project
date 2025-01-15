@@ -501,3 +501,66 @@ RETURN
     FROM VW_allUsersStationaryMeetingsWithRoomAndAddresses
     WHERE CityName = @cityName  
 );
+
+CREATE VIEW VW_FutureEventsWithDetails AS
+-- Kursy
+SELECT 
+    'Course' AS EventType,
+    c.CourseName AS EventName,
+    c.StartDate AS StartDate,
+    c.EndDate AS EndDate
+FROM 
+    Courses c
+WHERE 
+    c.StartDate > GETDATE()
+
+UNION ALL
+
+-- Webinary
+SELECT 
+    'Webinar' AS EventType,
+    w.WebinarTitle AS EventName,
+    w.StartDate AS StartDate,
+    w.EndDate AS EndDate
+FROM 
+    Webinars w
+WHERE 
+    w.StartDate > GETDATE()
+
+UNION ALL
+
+-- Spotkania studiów
+SELECT 
+    'Study Meeting' AS EventType,
+    sm.SubjectName AS EventName,
+    sm.StartTime AS StartDate,
+    sm.EndTime AS EndDate
+FROM 
+    StudyMeetings sm
+JOIN 
+    Subjects s ON sm.SubjectID = s.SubjectID
+WHERE 
+    sm.StartTime > GETDATE();
+
+
+CREATE FUNCTION dbo.fn_GetPracticesForCoordinator
+(
+    @CoordinatorID INT -- Parametr: ID koordynatora
+)
+    RETURNS TABLE
+        AS
+        RETURN
+        (
+        -- Zapytanie do pobrania praktyk dla koordynatora
+        SELECT
+            p.InternshipID AS PracticeID,          -- ID praktyki
+            p.StartDate AS StartDate,            -- Data rozpoczęcia
+            p.EndDate AS EndDate,                -- Data zakończenia
+            u.FirstName + ' ' + u.LastName AS CoordinatorName -- Imię i nazwisko koordynatora
+        FROM
+            Internship p
+                JOIN Employees c ON p.InternshipCoordinatorID = c.EmployeeID
+                JOIN Users u ON c.EmployeeID = u.UserID
+        WHERE
+            c.EmployeeID = @CoordinatorID    -- Filtrujemy po ID koordynatora
+        );
