@@ -461,7 +461,7 @@ RETURN
         vw_StudentsDiplomas.FirstName = @FirstName
         AND vw_StudentsDiplomas.LastName = @LastName
 
-    UNION ALL
+    UNION
 
     SELECT
         'Course Certificate' AS CertificateType,
@@ -564,3 +564,117 @@ CREATE FUNCTION dbo.fn_GetPracticesForCoordinator
         WHERE
             c.EmployeeID = @CoordinatorID    -- Filtrujemy po ID koordynatora
         );
+
+
+
+
+CREATE FUNCTION dbo.GetTranslatorsMeetings
+(
+    @FirstName NVARCHAR(100),
+    @LastName NVARCHAR(100)
+)
+RETURNS TABLE
+AS
+RETURN
+(
+
+SELECT 'Studia - spotkanie stacjonarne' as ActivityType, ST.StudyName as ActivityName, S.SubjectName as SubActivityName, StartTime, EndTime
+FROM StudyMeetings SM
+INNER JOIN StationaryMeetings SMM ON SMM.MeetingID=SM.MeetingID
+INNER JOIN Subjects S ON S.SubjectID=SM.SubjectID
+INNER JOIN Studies ST ON ST.StudiesID=S.StudiesID
+INNER JOIN Users U ON U.UserID = SM.TranslatorID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION
+
+SELECT 'Studia - spotkanie online' as ActivityType, ST.StudyName as ActivityName, S.SubjectName as SubActivityName, StartTime, EndTime
+FROM StudyMeetings SM
+INNER JOIN OnlineMeetings OM ON OM.MeetingID=SM.MeetingID
+INNER JOIN Subjects S ON S.SubjectID=SM.SubjectID
+INNER JOIN Studies ST ON ST.StudiesID=S.StudiesID
+INNER JOIN Users U ON U.UserID = SM.TranslatorID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION
+
+SELECT 'Kurs - spotkanie stacjonarne' as ActivityType, c.CourseName as ActivityName, cm.ModuleName as SubActivityName, StartDate as StartTime, EndDate as EndTime
+FROM StationaryCourseMeeting scm
+INNER JOIN CourseModules cm ON cm.ModuleID=scm.ModuleID
+INNER JOIN Courses c ON c.CourseID = cm.CourseID
+INNER JOIN Users U ON U.UserID = CM.TranslatorID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION
+
+SELECT 'Kurs - spotkanie online' as ActivityType, c.CourseName as ActivityName, cm.ModuleName as SubActivityName, StartDate as StartTime, EndDate as EndTime
+FROM OnlineCourseMeeting ocm
+INNER JOIN CourseModules cm ON cm.ModuleID=ocm.ModuleID
+INNER JOIN Courses c ON c.CourseID = cm.CourseID
+INNER JOIN Users U ON U.UserID = CM.TranslatorID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION 
+SELECT 'Webinar' as ActivityType, webinarName as ActivityName, NULL as SubActivityName, StartDate as StartTime, EndDate as EndTime
+FROM Webinars W
+INNER JOIN Users U ON U.UserID = W.TranslatorID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+);
+
+
+
+CREATE FUNCTION dbo.GetLecturersMeetings
+(
+    @FirstName NVARCHAR(100),
+    @LastName NVARCHAR(100)
+)
+RETURNS TABLE
+AS
+RETURN
+(
+
+SELECT 'Studia - spotkanie stacjonarne' as ActivityType, ST.StudyName as ActivityName, S.SubjectName as SubActivityName, StartTime, EndTime
+FROM StudyMeetings SM
+INNER JOIN StationaryMeetings SMM ON SMM.MeetingID=SM.MeetingID
+INNER JOIN Subjects S ON S.SubjectID=SM.SubjectID
+INNER JOIN Studies ST ON ST.StudiesID=S.StudiesID
+INNER JOIN Users U ON U.UserID = SM.LecturerID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION
+
+SELECT 'Studia - spotkanie online' as ActivityType, ST.StudyName as ActivityName, S.SubjectName as SubActivityName, StartTime, EndTime
+FROM StudyMeetings SM
+INNER JOIN OnlineMeetings OM ON OM.MeetingID=SM.MeetingID
+INNER JOIN Subjects S ON S.SubjectID=SM.SubjectID
+INNER JOIN Studies ST ON ST.StudiesID=S.StudiesID
+INNER JOIN Users U ON U.UserID = SM.LecturerID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION
+
+SELECT 'Kurs - spotkanie stacjonarne' as ActivityType, c.CourseName as ActivityName, cm.ModuleName as SubActivityName, StartDate as StartTime, EndDate as EndTime
+FROM StationaryCourseMeeting scm
+INNER JOIN CourseModules cm ON cm.ModuleID=scm.ModuleID
+INNER JOIN Courses c ON c.CourseID = cm.CourseID
+INNER JOIN Users U ON U.UserID = CM.LecturerID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION
+
+SELECT 'Kurs - spotkanie online' as ActivityType, c.CourseName as ActivityName, cm.ModuleName as SubActivityName, StartDate as StartTime, EndDate as EndTime
+FROM OnlineCourseMeeting ocm
+INNER JOIN CourseModules cm ON cm.ModuleID=ocm.ModuleID
+INNER JOIN Courses c ON c.CourseID = cm.CourseID
+INNER JOIN Users U ON U.UserID = CM.LecturerID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+
+UNION 
+SELECT 'Webinar' as ActivityType, webinarName as ActivityName, NULL as SubActivityName, StartDate as StartTime, EndDate as EndTime
+FROM Webinars W
+INNER JOIN Users U ON U.UserID = W.TeacherID
+WHERE U.FirstName = @FirstName AND U.LastName = @LastName
+);
+
+
+
