@@ -2716,12 +2716,13 @@ AS
       DECLARE @DetailID INT;
       DECLARE @OrderDate DATETIME = Getdate();
       DECLARE @PaymentLink VARCHAR(255) = NULL;
+      DECLARE @PaymentDeferred  BIT = 0;
 
       INSERT INTO orders
                   (studentid,
-                   orderdate)
+                   orderdate, paymentDeferred)
       VALUES      (@UserID,
-                   @OrderDate);
+                   @OrderDate, @PaymentDeferred);
 
       SET @OrderID = Scope_identity();
 
@@ -2753,7 +2754,7 @@ AS
               FROM   webinars
               WHERE  webinarid = @ActivityID;
 
-            SET @DetailID = Scope_identity();
+            
 
             INSERT INTO orderdetails
                         (orderid,
@@ -2768,6 +2769,8 @@ AS
                          @Price,
                          NULL,
                          NULL);
+            
+            SET @DetailID = Scope_identity();
 
             IF @TypeOfActivity = 2
               BEGIN

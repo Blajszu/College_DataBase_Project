@@ -29,27 +29,19 @@ BEGIN
 END;
 
 
-CREATE TRIGGER BeforeOrderDetailsInsert
+  CREATE TRIGGER BeforeOrderDetailsInsert
 ON OrderDetails
 FOR INSERT
 AS
 BEGIN
-    DECLARE @UserID INT;
     DECLARE @ActivityID INT;
     DECLARE @TypeOfActivity INT;
     DECLARE @StudentLimit INT;
     DECLARE @TotalBooked INT;
 
-    SELECT @UserID = O.StudentID, @ActivityID = I.ActivityID, @TypeOfActivity = I.TypeOfActivity
+    SELECT @ActivityID = I.ActivityID, @TypeOfActivity = I.TypeOfActivity
     FROM INSERTED I
 	INNER JOIN Orders O ON I.OrderID=O.OrderID;
-
-    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @UserID AND Active = 1)
-    BEGIN
-        RAISERROR ('Użytkownik o ID %d jest nieaktywny i nie może złożyć zamówienia.', 16, 1, @UserID);
-        ROLLBACK TRANSACTION; 
-        RETURN;
-    END
 
     IF @TypeOfActivity = 4
     BEGIN
@@ -116,14 +108,13 @@ ON OrderDetails
 FOR UPDATE
 AS
 BEGIN
-    DECLARE @UserID INT;
     DECLARE @OldActivityID INT;
     DECLARE @NewActivityID INT;
     DECLARE @TypeOfActivity INT;
     DECLARE @StudentLimit INT;
     DECLARE @TotalBooked INT;
 
-    SELECT @UserID = O.StudentID, 
+    SELECT 
            @OldActivityID = OD.ActivityID, 
            @NewActivityID = I.ActivityID, 
            @TypeOfActivity = OD.TypeOfActivity
@@ -133,13 +124,6 @@ BEGIN
 	INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
     WHERE I.OrderID = D.OrderID;
 
-
-    IF NOT EXISTS (SELECT 1 FROM Users WHERE UserID = @UserID AND Active = 1)
-    BEGIN
-        RAISERROR ('Użytkownik o ID %d jest nieaktywny i nie może zaktualizować zamówienia.', 16, 1, @UserID);
-        ROLLBACK TRANSACTION; 
-        RETURN;
-    END
 
     IF @OldActivityID != @NewActivityID
     BEGIN

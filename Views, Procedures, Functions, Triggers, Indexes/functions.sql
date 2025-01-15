@@ -158,17 +158,19 @@ GO
 
 
 
-CREATE PROCEDURE GetRemainingSeats
+CREATE FUNCTION dbo.GetRemainingSeatsFn
+(
     @ActivityID INT,
-    @TypeOfActivity INT,
-    @RemainingSeats INT OUTPUT
+    @TypeOfActivity INT
+)
+RETURNS INT
 AS
 BEGIN
-    SET NOCOUNT ON;
+    DECLARE @RemainingSeats INT;
 
     IF @TypeOfActivity = 1
     BEGIN
-        SET @RemainingSeats = 2147483647;
+        RETURN 2147483647;
     END
 
     IF @TypeOfActivity = 2
@@ -179,25 +181,18 @@ BEGIN
              WHERE od.ActivityID = c.CourseID AND od.TypeOfActivity = 2)
         FROM Courses c
         WHERE c.CourseID = @ActivityID;
-
-        IF @RemainingSeats IS NULL OR @RemainingSeats < 0
-            SET @RemainingSeats = 2147483647;
     END
 
     IF @TypeOfActivity = 3
     BEGIN
         SELECT @RemainingSeats = s.StudentLimit -
             (SELECT ISNULL(COUNT(*), 0)
-             FROM Subjects ss
-             INNER JOIN StudyMeetings SM ON SM.SubjectID = ss.SubjectID
-             INNER JOIN StudyMeetingPayment SMP ON SMP.MeetingID = SM.MeetingID
-             WHERE ss.StudiesID = s.StudiesID)
+             FROM OrderDetails OD
+             WHERE OD.ActivityID = s.StudiesID and OD.TypeOfActivity = 3)
         FROM Studies s
         WHERE s.StudiesID = @ActivityID;
-
-        IF @RemainingSeats IS NULL OR @RemainingSeats < 0
-            SET @RemainingSeats = 2147483647;
     END
+
 
     IF @TypeOfActivity = 4
     BEGIN
@@ -208,19 +203,16 @@ BEGIN
         FROM StationaryMeetings sm
         INNER JOIN StudyMeetings smt ON smt.MeetingID = sm.MeetingID
         WHERE sm.MeetingID = @ActivityID;
-
-        IF @RemainingSeats IS NULL OR @RemainingSeats < 0
-            SET @RemainingSeats = 2147483647;
     END
 
-    -- Jeśli @RemainingSeats nie zostało ustawione
+    -- Obsługa wartości NULL i ujemnych
     IF @RemainingSeats IS NULL
-        SET @RemainingSeats = -1;
+        SET @RemainingSeats = 2147483647;
 
-    -- Zwrócenie wyniku
-    SELECT @RemainingSeats AS RemainingSeats;
+    RETURN @RemainingSeats;
 END;
-GO
+
+
 
 
 CREATE FUNCTION GetAvailableRooms
