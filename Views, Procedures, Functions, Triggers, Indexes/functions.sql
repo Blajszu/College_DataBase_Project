@@ -175,34 +175,18 @@ BEGIN
 
     IF @TypeOfActivity = 2
     BEGIN
-        SELECT @RemainingSeats = c.StudentLimit -
-            (SELECT ISNULL(COUNT(*), 0)
-             FROM OrderDetails od
-             WHERE od.ActivityID = c.CourseID AND od.TypeOfActivity = 2)
-        FROM Courses c
-        WHERE c.CourseID = @ActivityID;
+        SELECT @RemainingSeats = available from VW_RemainingSeats where id=@activityID AND activityType = 'Kurs';
     END
 
     IF @TypeOfActivity = 3
     BEGIN
-        SELECT @RemainingSeats = s.StudentLimit -
-            (SELECT ISNULL(COUNT(*), 0)
-             FROM OrderDetails OD
-             WHERE OD.ActivityID = s.StudiesID and OD.TypeOfActivity = 3)
-        FROM Studies s
-        WHERE s.StudiesID = @ActivityID;
+        SELECT @RemainingSeats = available from VW_RemainingSeats where id=@activityID AND activityType = 'Studia';
     END
 
 
     IF @TypeOfActivity = 4
     BEGIN
-        SELECT @RemainingSeats = sm.StudentLimit -
-            (SELECT ISNULL(COUNT(*), 0)
-             FROM StudyMeetingPayment smp
-             WHERE smp.MeetingID = sm.MeetingID)
-        FROM StationaryMeetings sm
-        INNER JOIN StudyMeetings smt ON smt.MeetingID = sm.MeetingID
-        WHERE sm.MeetingID = @ActivityID;
+        SELECT @RemainingSeats = available from VW_RemainingSeats where id=@activityID AND activityType = 'Spotkanie studyjne';
     END
 
     -- Obsługa wartości NULL i ujemnych
