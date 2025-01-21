@@ -1,7 +1,8 @@
 EXEC AddNewWebinar
     @WebinarName = 'Nowy Webinar',
-    @StartDate = '2025-01-16 14:00',
-    @EndDate = '2025-01-16 15:30',
+	@WebinarDescription = 'opis webinaru',
+    @StartDate = '2025-01-27 14:00',
+    @EndDate = '2025-01-27 15:30',
     @TeacherID = 977,
     @TranslatorID = null,
     @LanguageID = 1,
@@ -48,32 +49,92 @@ EXEC AddCourseModule
 
 EXEC AddCourseMeeting
     @ModuleID = 2,
-    @MeetingType = 2,
+    @MeetingType = 'Stationary',
+    @StartDate = '2025-01-18 12:00',
+    @EndDate = '2025-01-18 14:00',
+    @RoomID = null
+
+EXEC AddCourseMeeting
+    @ModuleID = 2,
+    @MeetingType = 'Online',
     @StartDate = '2025-01-18 12:00',
     @EndDate = '2025-01-18 14:00',
     @RoomID = null
 
 EXEC AddNewStudy
     @StudyName = 'Nowe studia',
-    @StudiesCoordinatorID = 6,
+	@StudyDescription = 'opis studiów',
+    @StudiesCoordinatorID = 478,
     @StudyPrice = 500,
     @NumberOfTerms = 7,
     @StudentLimit = 10
 
 EXEC AddNewSubject
     @SubjectName = 'Nowy przedmiot',
+	@SubjectDescription = 'opis przedmiotu',
     @TermNumber = 1,
     @NumberOfHoursInTerm = 21,
     @TeacherID = 984,
-    @StudiesID = 10
+    @StudiesID = 11
 
 EXEC AddSubjectMeeting
-    @SubjectID = 263,
-    @MeetingType = 1,
+    @SubjectID = 1109,
+	@LanguageId = 1,
+    @MeetingType = 'Online Synchroniczny',
     @StartTime = '2025-02-01 11:00',
     @EndTime = '2025-02-01 14:00',
+	@LecturerID = 5,
+    @MeetingPrice = 100,
+    @MeetingPriceForOthers = 200,
+    @StudentLimit = 10,
+    @RoomID = null,
+    @MeetingLink = 'link';
+
+EXEC AddSubjectMeeting
+    @SubjectID = 1109,
+	@LanguageId = 1,
+    @MeetingType = 'Stacjonarny',
+    @StartTime = '2025-02-02 11:00',
+    @EndTime = '2025-02-02 14:00',
+	@LecturerID = 5,
     @MeetingPrice = 100,
     @MeetingPriceForOthers = 200,
     @StudentLimit = 10,
     @RoomID = 12,
-    @MeetingLink = null
+    @MeetingLink = null;
+
+
+
+
+
+
+EXEC AddUser
+	@FirstName = 'Jagoda',
+	@LastName = 'Kurosad',
+	@Street = 'Tokarskiego 1',
+	@City = 'Kraków',
+	@Email = 'jagoda.kurosad@example.com',
+	@Phone = '659874452',
+	@DateOfBirth = '2005-10-05';
+
+
+DECLARE @ActivityList ACTIVITYLISTTYPE;
+INSERT INTO @ActivityList (activityid, typeofactivity)
+VALUES 
+    (11,3),
+    (281,2),
+    (5188,1);
+
+DECLARE @UserID INT = 1173;
+EXEC AddOrderWithDetails @UserID = @UserID, @ActivityList = @ActivityList;
+
+
+
+
+DECLARE @ActivityList1 ACTIVITYLISTTYPE;
+INSERT INTO @ActivityList1 (activityid, typeofactivity)
+VALUES 
+    (1107,4);
+
+DECLARE @UserID1 INT = 2;
+EXEC AddOrderWithDetails @UserID = @UserID1, @ActivityList = @ActivityList1;
