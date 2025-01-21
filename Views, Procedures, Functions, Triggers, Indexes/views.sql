@@ -1584,3 +1584,22 @@ FROM
     VW_StudiesStartDateEndDate vsde ON s.StudiesID = vsde.StudiesID
 WHERE
     vsde.StartDate > GETDATE();
+
+
+--dostępne miejsca
+CREATE VIEW VW_RemainingSeats AS
+SELECT 'kurs' as 'activityType', c.coursename as activityName, c.courseid as id, c.StudentLimit-(SELECT ISnull(Count(*),0) FROM OrderDetails od where od.ActivityID=c.courseid and od.TypeOfActivity=2) as available, FORMAT(starts.[Data rozpoczęcia], 'yyyy-MM-dd HH:mm') as start
+FROM courses c
+inner join VW_CoursesStartDateEndDate starts on starts.id = c.CourseID
+UNION
+SELECT 'studia' as 'activityType', s.StudyName as activityName, s.StudiesID as id, s.StudentLimit - (SELECT ISNULL(COUNT(*), 0) FROM OrderDetails OD WHERE OD.ActivityID = s.StudiesID and OD.TypeOfActivity = 3) as available, starts.startDate as start
+FROM Studies s
+inner join VW_StudiesStartDateEndDate starts on starts.StudiesID=s.StudiesID
+UNION
+SELECT 'spotkanie studyjne' as 'activityType', sub.subjectname as name, sm.MeetingID as id, isnull(sm.StudentLimit,0) - (SELECT ISNULL(COUNT(*), 0) as available
+             FROM StudyMeetingPayment smp
+			 where smp.MeetingID = sm.MeetingID)- 
+			 (select count(*) from orderdetails od where od.ActivityID=sm.meetingid and od.TypeOfActivity=4)  as available, FORMAT(studmeet.StartTime, 'yyyy-MM-dd HH:mm') as start
+FROM StationaryMeetings sm
+inner join StudyMeetings studmeet on studmeet.MeetingID=sm.MeetingID
+inner join Subjects sub on sub.Subjectid=studmeet.SubjectID
