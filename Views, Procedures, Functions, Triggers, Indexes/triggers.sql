@@ -29,15 +29,14 @@ BEGIN
 END;
 
 
-  CREATE TRIGGER BeforeOrderDetailsInsert
+CREATE TRIGGER BeforeOrderDetailsInsert
 ON OrderDetails
 FOR INSERT
 AS
 BEGIN
     DECLARE @ActivityID INT;
     DECLARE @TypeOfActivity INT;
-    DECLARE @StudentLimit INT;
-    DECLARE @TotalBooked INT;
+    DECLARE @RemainingSeats INT;
 
     SELECT @ActivityID = I.ActivityID, @TypeOfActivity = I.TypeOfActivity
     FROM INSERTED I
@@ -45,20 +44,11 @@ BEGIN
 
     IF @TypeOfActivity = 4
     BEGIN
-        SELECT @StudentLimit = SM.StudentLimit
-        FROM StationaryMeetings SM
-        INNER JOIN StudyMeetings SM2 ON SM.MeetingID = SM2.MeetingID
-        WHERE SM2.MeetingID = @ActivityID;
-
-        SELECT @TotalBooked = COUNT(O.OrderID)
-        FROM Orders O
-        INNER JOIN OrderDetails OD ON O.OrderID = OD.OrderID
-        WHERE OD.ActivityID = @ActivityID
-        AND OD.TypeOfActivity = @TypeOfActivity;
-
-        IF (@TotalBooked + 1) > @StudentLimit
+        
+        SET @RemainingSeats = dbo.GetRemainingSeatsFn(@ActivityID, @TypeOfActivity);
+        IF (@RemainingSeats<=0)
         BEGIN
-            RAISERROR ('Przekroczono limit miejsc na spotkaniu stacjonarnym dla aktywności o ID %d.', 16, 1, @ActivityID);
+            RAISERROR ('Brak miejsc na spotkaniu o ID %d.', 16, 1, @ActivityID);
             ROLLBACK TRANSACTION; 
             RETURN;
         END
@@ -67,17 +57,11 @@ BEGIN
 
     IF @TypeOfActivity = 3
     BEGIN
-        SELECT @StudentLimit = S.StudentLimit
-        FROM Studies S WHERE S.StudiesID = @ActivityID;
+        SET @RemainingSeats = dbo.GetRemainingSeatsFn(@ActivityID, @TypeOfActivity);
 
-        SELECT @TotalBooked = COUNT(OD.OrderID)
-        FROM OrderDetails OD
-        WHERE OD.ActivityID = @ActivityID
-        AND OD.TypeOfActivity = @TypeOfActivity;
-
-        IF (@TotalBooked + 1) > @StudentLimit
+        IF (@RemainingSeats<=0)
         BEGIN
-            RAISERROR ('Przekroczono limit miejsc na studiach dla aktywności o ID %d.', 16, 1, @ActivityID);
+            RAISERROR ('Brak miejsc na studiach o ID %d.', 16, 1, @ActivityID);
             ROLLBACK TRANSACTION;
             RETURN;
         END
@@ -85,22 +69,17 @@ BEGIN
 
     IF @TypeOfActivity = 2
     BEGIN
-        SELECT @StudentLimit = C.StudentLimit
-        FROM Courses C WHERE C.CourseID = @ActivityID;
+        SET @RemainingSeats = dbo.GetRemainingSeatsFn(@ActivityID, @TypeOfActivity);
 
-        SELECT @TotalBooked = COUNT(OD.OrderID)
-        FROM OrderDetails OD
-        WHERE OD.ActivityID = @ActivityID
-        AND OD.TypeOfActivity = @TypeOfActivity;
-
-        IF (@TotalBooked + 1) > @StudentLimit
+        IF (@RemainingSeats<=0)
         BEGIN
-            RAISERROR ('Przekroczono limit miejsc na kursie dla aktywności o ID %d.', 16, 1, @ActivityID);
+            RAISERROR ('Brak miejsc na kursie  o ID %d.', 16, 1, @ActivityID);
             ROLLBACK TRANSACTION; 
             RETURN;
         END
     END
 END;
+
 
 
 CREATE TRIGGER BeforeOrderDetailsUpdate
