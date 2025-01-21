@@ -2709,6 +2709,7 @@ CREATE PROCEDURE Addorderwithdetails @UserID       INT,
                                      @ActivityList ACTIVITYLISTTYPE readonly
 AS
   BEGIN
+    BEGIN TRANSACTION
       DECLARE @OrderID INT;
       DECLARE @ActivityID INT;
       DECLARE @TypeOfActivity INT;
