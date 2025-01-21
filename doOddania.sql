@@ -105,7 +105,8 @@ EXEC AddSubjectMeeting
 
 
 
-
+EXEC UpdatePaymentStatusOrderDetails
+	@DetailID = 69412;
 
 
 EXEC AddUser
@@ -144,3 +145,6 @@ select * from usersroles where userid = 9
 select * from usersroles where roleid = 2
 select * from orders where studentid = 9
 select * from CourseModulesPassed where studentid = 9
+
+
+
