@@ -138,3 +138,9 @@ VALUES
 
 DECLARE @UserID1 INT = 2;
 EXEC AddOrderWithDetails @UserID = @UserID1, @ActivityList = @ActivityList1;
+
+
+select * from usersroles where userid = 9
+select * from usersroles where roleid = 2
+select * from orders where studentid = 9
+select * from CourseModulesPassed where studentid = 9
