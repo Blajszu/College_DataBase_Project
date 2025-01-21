@@ -125,7 +125,7 @@ CREATE TABLE Languages (
 
 -- Table: OnlineCourseMeeting
 CREATE TABLE OnlineCourseMeeting (
-    MeetingID int  NOT NULL,
+    MeetingID int  NOT NULL IDENTITY(1,1),
     ModuleID int  NOT NULL,
     StartDate datetime  NOT NULL,
     EndDate datetime  NOT NULL,
@@ -193,7 +193,7 @@ CREATE TABLE Rooms (
 
 -- Table: StationaryCourseMeeting
 CREATE TABLE StationaryCourseMeeting (
-    MeetingID int  NOT NULL,
+    MeetingID int  NOT NULL IDENTITY(1,1),
     ModuleID int  NOT NULL,
     RoomID int  NOT NULL,
     StartDate datetime  NOT NULL,
