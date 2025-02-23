@@ -2,6 +2,11 @@
 ## Project Overview
 This project delivers a functional database system for a company offering various types of courses and training programs.
 
+Realized as part of the Database Basics course at AGH University of Krakow by:
+- Jagoda Kurosad [jagodakurosad](https://github.com/jagodakurosad)
+- Katarzyna Bęben [kasiabeben10](https://github.com/kasiabeben10)
+- Oskar Blajsz [Blajszu](https://github.com/Blajszu)
+
 ## Implemented Services
 
 1. **Webinars**
