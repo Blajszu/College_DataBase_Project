@@ -85,6 +85,10 @@ The system includes database views for generating essential reports. Some implem
 
 This system successfully delivers a structured, scalable, and efficient database solution for managing online and on-site educational services.
 
+>[!NOTE]
+> The database system has been designed and implemented for Microsoft SQL Server and is fully compatible with SQL Server Management Studio (SSMS).
+>Deployment on other database management systems (e.g., MySQL, PostgreSQL) would require modifications.
+
 Very basic documentation (in Polish) available [here](https://github.com/jagodakurosad/DataBasesProject/tree/main/documentation.pdf).
 
 
