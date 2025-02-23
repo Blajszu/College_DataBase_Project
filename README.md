@@ -85,4 +85,6 @@ The system includes database views for generating essential reports. Some implem
 
 This system successfully delivers a structured, scalable, and efficient database solution for managing online and on-site educational services.
 
+Very basic documentation (in Polish) available [here](https://github.com/jagodakurosad/DataBasesProject/tree/main/documentation.pdf).
+
 
