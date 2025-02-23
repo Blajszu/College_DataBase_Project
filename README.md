@@ -58,6 +58,10 @@ The system includes database views for generating essential reports. Some implem
 - Participants receive a diploma upon completion, sent via traditional mail.
 
 ## Technical Implementation
+
+### Database Schema
+![Image](https://github.com/user-attachments/assets/98526965-c013-4dce-a60e-b9289da072c2)
+
 ### System Functionalities
 - User roles and corresponding privileges are defined.
 - Database design and implementation completed.
